@@ -1,0 +1,38 @@
+# =========================
+# Node / Angular (Frontend)
+# =========================
+node_modules/
+dist/
+out-tsc/
+.angular/
+coverage/
+.npm/
+
+# =========================
+# .NET / C# (Backend)
+# =========================
+bin/
+obj/
+TestResults/
+*.user
+*.userosscache
+*.sln.docstates
+appsettings.Development.json
+appsettings.Local.json
+
+# IDE / OS Files
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Environment variables
+.env
+.env.local
