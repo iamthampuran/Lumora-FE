@@ -1,0 +1,140 @@
+<div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+  <section class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="grid grid-cols-1 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+      <div class="p-8">
+        <h3 class="text-lg font-serif text-gray-900 mb-4">About the Studio</h3>
+        <p class="text-sm text-gray-600 leading-relaxed mb-4">
+          {{ aboutDetails.about }}
+        </p>
+        <button class="text-[#CF6B4E] text-sm font-medium flex items-center hover:underline group">
+          Read more
+          <svg
+            class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-8">
+        <h3 class="text-lg font-serif text-gray-900 mb-6">Contact</h3>
+
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <svg
+              class="w-5 h-5 text-gray-400 mt-0.5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
+            <span class="text-sm text-gray-700 font-medium">{{
+              aboutDetails.contactInformation.number
+            }}</span>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <svg
+              class="w-5 h-5 text-gray-400 mt-0.5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path
+                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              ></path>
+            </svg>
+            <a
+              href="http://{{ aboutDetails.contactInformation.website }}"
+              class="text-sm text-gray-700 font-medium hover:underline hover:text-[#CF6B4E] transition-colors"
+              >{{ aboutDetails.contactInformation.website }}</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8">
+        <h3 class="text-lg font-serif text-gray-900 mb-6">Location</h3>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <svg
+              class="w-5 h-5 text-gray-400 mt-0.5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="text-sm text-gray-700 font-medium">{{ aboutDetails.locationDetails.city }}</span>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <svg
+              class="w-5 h-5 text-gray-400 mt-0.5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+            <div>
+              <p class="text-xs text-gray-500 mb-0.5">Service Radius</p>
+              <p class="text-sm text-gray-700 font-medium">Up to {{ aboutDetails.locationDetails.distance }} km from {{ aboutDetails.locationDetails.city }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8">
+        <h3 class="text-lg font-serif text-gray-900 mb-6">Team</h3>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <svg
+              class="w-5 h-5 text-gray-400 mt-0.5 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              viewBox="0 0 24 24"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span class="text-sm text-gray-700 font-medium">{{ aboutDetails.teamMembers }} Members</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
