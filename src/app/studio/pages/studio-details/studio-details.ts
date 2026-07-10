@@ -3,6 +3,7 @@ import { Hero } from '../../components/hero/hero';
 import {
   PortfolioDetails,
   PricingDetails,
+  ReviewDetails,
   StudioIdentityResponse,
   StudioProfileModel,
   TagDetails,
@@ -12,10 +13,11 @@ import { ActivatedRoute } from '@angular/router';
 import { StatsBar } from '../../components/stats-bar/stats-bar';
 import { About } from '../../components/about/about';
 import { PortfolioGallery } from '../../components/portfolio-gallery/portfolio-gallery';
+import { Reviews } from "../../components/reviews/reviews";
 
 @Component({
   selector: 'app-studio-details',
-  imports: [Hero, StatsBar, About, PortfolioGallery],
+  imports: [Hero, StatsBar, About, PortfolioGallery, Reviews],
   templateUrl: './studio-details.html',
   styleUrl: './studio-details.css',
 })
@@ -54,6 +56,9 @@ export class StudioDetails implements OnInit {
 
   public samplePortfolioData!: PortfolioDetails[];
 
+  public reviewDetails!: ReviewDetails[];
+
+
   protected studioService = inject(StudioService);
   private route = inject(ActivatedRoute);
 
@@ -62,6 +67,7 @@ export class StudioDetails implements OnInit {
     this.assignStatsBarData();
     this.assignAboutData();
     this.assignPortfolioData();
+    this.assignReviewData();
   }
 
   ngOnInit(): void {
@@ -158,5 +164,45 @@ export class StudioDetails implements OnInit {
         displayOrder: 3,
       }
     ];
+  }
+
+  assignReviewData() {
+    this.reviewDetails = [
+      {
+        id: '1',
+        reviewerName: 'John Doe',
+        rating: 5,
+        comment: 'Amazing experience! Highly recommend.',
+        date: new Date('2023-01-15'),
+      },
+      {
+        id: '2',
+        reviewerName: 'Jane Smith',
+        rating: 4,
+        comment: 'Great service, but a bit pricey.',
+        date: new Date('2023-02-20'),
+      },
+      {
+        id: '3',
+        reviewerName: 'Emily Johnson',
+        rating: 3,
+        comment: 'Good, but could be better in terms of communication.',
+        date: new Date('2023-03-10'),
+      },
+      {
+        id: '4',
+        reviewerName: 'Michael Brown',
+        rating: 5,
+        comment: 'Absolutely loved it! Will use their services again.',
+        date: new Date('2023-04-05'),
+      },
+      {
+        id: '5',
+        reviewerName: 'Sarah Davis',
+        rating: 2,
+        comment: 'Not satisfied with the overall experience.',
+        date: new Date('2023-05-12'),
+      }
+    ];    
   }
 }
