@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { PortfolioDetails } from '../../models/studio-profile-model';
 
 @Component({
@@ -7,12 +7,6 @@ import { PortfolioDetails } from '../../models/studio-profile-model';
   templateUrl: './portfolio-gallery.html',
   styleUrl: './portfolio-gallery.css',
 })
-export class PortfolioGallery implements OnInit {
+export class PortfolioGallery{
   @Input() portfolioDetails!: PortfolioDetails[];
-  ngOnInit(): void {
-    console.log('Portfolio Details:', this.portfolioDetails);
-    for (let i = 0; i < this.portfolioDetails.length; i++) {
-      console.log(this.portfolioDetails[i].imageUrl);
-    }
-  }
 }
