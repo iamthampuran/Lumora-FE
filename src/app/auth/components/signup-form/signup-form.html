@@ -1,0 +1,190 @@
+<!-- Role Selection -->
+<div class="mb-8">
+  <p class="font-semibold text-gray-900 text-sm mb-1">I'm signing up as</p>
+  <p class="text-xs text-gray-500 mb-4">You can choose to be a Consumer or Studio.</p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <!-- Consumer Card -->
+    <button
+      type="button"
+      (click)="setRole(UserRole.Cosnsumer)"
+      class="relative border rounded-2xl p-6 cursor-pointer transition-all text-center flex flex-col items-center"
+      [class.border-[#CF6B4E]]="selectedRole() === UserRole.Cosnsumer"
+      [class.ring-1]="selectedRole() === UserRole.Cosnsumer"
+      [class.ring-[#CF6B4E]]="selectedRole() === UserRole.Cosnsumer"
+      [class.border-gray-200]="selectedRole() !== UserRole.Cosnsumer"
+      [attr.aria-pressed]="selectedRole() === UserRole.Cosnsumer"
+    >
+      <div class="w-10 h-10 rounded-full bg-orange-50 text-[#CF6B4E] flex items-center justify-center mb-3">
+        <!-- User Icon -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+          ></path>
+        </svg>
+      </div>
+      <h3 class="font-bold text-gray-900 text-sm mb-1">Consumer</h3>
+      <p class="text-xs text-gray-500 leading-relaxed max-w-50">
+        I want to book and manage photography for my events.
+      </p>
+    </button>
+
+    <!-- Studio Card -->
+    <button
+      type="button"
+      (click)="setRole(UserRole.Studio)"
+      class="relative border rounded-2xl p-6 cursor-pointer transition-all text-center flex flex-col items-center"
+      [class.border-[#CF6B4E]]="selectedRole() === UserRole.Studio"
+      [class.ring-1]="selectedRole() === UserRole.Studio"
+      [class.ring-[#CF6B4E]]="selectedRole() === UserRole.Studio"
+      [class.border-gray-200]="selectedRole() !== UserRole.Studio"
+      [attr.aria-pressed]="selectedRole() === UserRole.Studio"
+    >
+      <div class="w-10 h-10 rounded-full bg-orange-50 text-[#CF6B4E] flex items-center justify-center mb-3">
+        <!-- Studio/Store Icon -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"
+          ></path>
+        </svg>
+      </div>
+      <h3 class="font-bold text-gray-900 text-sm mb-1">Studio</h3>
+      <p class="text-xs text-gray-500 leading-relaxed max-w-50">
+        I want to showcase my studio and grow my business.
+      </p>
+    </button>
+  </div>
+</div>
+
+<hr class="border-gray-100 my-8" />
+
+<!-- Form Inputs -->
+<form class="space-y-6" [formGroup]="formGroup" (ngSubmit)="onSubmit()" novalidate>
+  <!-- Email Address -->
+  <div>
+    <label for="email" class="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+          ></path>
+        </svg>
+      </div>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="Enter your email address"
+        class="block w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400"
+        [attr.aria-invalid]="
+          hasControlError('email', 'required') ||
+          hasControlError('email', 'email') ||
+          hasControlError('email', 'maxlength')
+        "
+        aria-describedby="email-error"
+      />
+    </div>
+
+    @if (hasControlError('email', 'required')) {
+      <p id="email-error" class="text-xs text-red-600 mt-2">Email is required.</p>
+    } @else if (hasControlError('email', 'email')) {
+      <p id="email-error" class="text-xs text-red-600 mt-2">Enter a valid email address.</p>
+    } @else if (hasControlError('email', 'maxlength')) {
+      <p id="email-error" class="text-xs text-red-600 mt-2">Email address is too long.</p>
+    }
+  </div>
+
+  <!-- Password -->
+  <div>
+    <label for="password" class="block text-sm font-semibold text-gray-900 mb-2">Password</label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+          ></path>
+        </svg>
+      </div>
+      <input
+        id="password"
+        [type]="showPassword() ? 'text' : 'password'"
+        formControlName="password"
+        autocomplete="new-password"
+        placeholder="Create a password"
+        class="block w-full pl-11 pr-11 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400"
+        [attr.aria-invalid]="
+          hasControlError('password', 'required') ||
+          hasControlError('password', 'minlength') ||
+          hasControlError('password', 'maxlength') ||
+          hasControlError('password', 'pattern')
+        "
+        aria-describedby="password-help password-error"
+      />
+      <button
+        type="button"
+        (click)="togglePasswordVisibility()"
+        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+        [attr.aria-pressed]="showPassword()"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+          ></path>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+      </button>
+    </div>
+    <p id="password-help" class="text-xs text-gray-400 mt-2">
+      Minimum 8 characters with uppercase, lowercase, number, and symbol.
+    </p>
+
+    @if (hasControlError('password', 'required')) {
+      <p id="password-error" class="text-xs text-red-600 mt-2">Password is required.</p>
+    } @else if (hasControlError('password', 'minlength')) {
+      <p id="password-error" class="text-xs text-red-600 mt-2">Password must be at least 8 characters.</p>
+    } @else if (hasControlError('password', 'maxlength')) {
+      <p id="password-error" class="text-xs text-red-600 mt-2">Password is too long.</p>
+    } @else if (hasControlError('password', 'pattern')) {
+      <p id="password-error" class="text-xs text-red-600 mt-2">
+        Use at least one uppercase, one lowercase, one number, and one symbol.
+      </p>
+    }
+  </div>
+
+  <!-- Submit Button -->
+  <div class="pt-2">
+    <button
+      type="submit"
+      class="w-full flex justify-center items-center py-3.5 px-4 rounded-xl shadow-sm text-sm font-medium text-white bg-[#CF6B4E] hover:bg-[#ba5b40] transition-colors"
+      [disabled]="formGroup.invalid || isCreatingUser()"
+    >
+      @if (isCreatingUser()) {
+        Creating account...
+      } @else {
+        Continue
+        <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      }
+    </button>
+
+    @if (isCreatingUser()) {
+      <div class="mt-4 flex justify-center">
+        <app-loader text="creating"></app-loader>
+      </div>
+    }
+  </div>
+</form>
