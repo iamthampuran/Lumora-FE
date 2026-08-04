@@ -1,0 +1,190 @@
+<div class="min-h-screen bg-[#FDFBF9] font-sans flex flex-col justify-between">
+  @if (isPageTransitionLoading()) {
+    <div class="fixed inset-0 z-50 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+      <ng-container
+        [ngComponentOutlet]="loaderComponent"
+        [ngComponentOutletInputs]="{ text: 'loading' }"
+      ></ng-container>
+    </div>
+  }
+
+  <!-- Top Navigation Header -->
+  <header class="w-full bg-white border-b border-gray-100 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <!-- Logo Area -->
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full border border-orange-200 flex items-center justify-center text-[#CF6B4E] bg-white"
+        >
+          <!-- Logo SVG -->
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold tracking-widest text-gray-900 uppercase">Lumora</h1>
+          <p class="text-[10px] tracking-[0.2em] text-gray-400 uppercase">Capturing Stories</p>
+        </div>
+      </div>
+
+      <!-- Center Navigation Links -->
+      <!-- <nav class="hidden md:flex items-center space-x-10 text-sm font-medium">
+        <a href="#" class="text-gray-900 border-b-2 border-gray-900 pb-0.5">Explore</a>
+        <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">Stories</a>
+        <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">About</a>
+        <a href="#" class="text-gray-500 hover:text-gray-900 transition-colors">For Photographers</a>
+      </nav> -->
+
+      <!-- Right Action Link -->
+      <div>
+        <button
+          type="button"
+          (click)="goToLogin()"
+          class="text-[#CF6B4E] text-sm font-medium hover:underline cursor-pointer"
+        >
+          Sign In
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Centered Content Container -->
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-10 my-8">
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 sm:p-12 w-full max-w-2xl">
+      <!-- Progress Stepper -->
+      <div class="flex items-center justify-center max-w-md mx-auto mb-12">
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center relative">
+          <div
+            class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium"
+            [class.bg-[#CF6B4E]]="isStepActive(1) || isStepCompleted(1)"
+            [class.border-[#CF6B4E]]="isStepActive(1) || isStepCompleted(1)"
+            [class.text-white]="isStepActive(1) || isStepCompleted(1)"
+            [class.bg-white]="!isStepActive(1) && !isStepCompleted(1)"
+            [class.border-gray-200]="!isStepActive(1) && !isStepCompleted(1)"
+            [class.text-gray-400]="!isStepActive(1) && !isStepCompleted(1)"
+          >
+            @if (isStepCompleted(1)) {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            } @else {
+              1
+            }
+          </div>
+          <span
+            class="text-xs font-medium mt-2 absolute top-8 whitespace-nowrap"
+            [class.text-gray-900]="isStepActive(1)"
+            [class.text-gray-400]="!isStepActive(1)"
+            >Account Details</span
+          >
+        </div>
+
+        <div class="flex-1 h-px mx-4" [class.bg-[#CF6B4E]]="isStepCompleted(1)" [class.bg-gray-200]="!isStepCompleted(1)"></div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center relative">
+          <div
+            class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium"
+            [class.bg-[#CF6B4E]]="isStepActive(2) || isStepCompleted(2)"
+            [class.border-[#CF6B4E]]="isStepActive(2) || isStepCompleted(2)"
+            [class.text-white]="isStepActive(2) || isStepCompleted(2)"
+            [class.bg-white]="!isStepActive(2) && !isStepCompleted(2)"
+            [class.border-gray-200]="!isStepActive(2) && !isStepCompleted(2)"
+            [class.text-gray-400]="!isStepActive(2) && !isStepCompleted(2)"
+          >
+            @if (isStepCompleted(2)) {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            } @else {
+              2
+            }
+          </div>
+          <span
+            class="text-xs font-medium mt-2 absolute top-8 whitespace-nowrap"
+            [class.text-gray-900]="isStepActive(2)"
+            [class.text-gray-400]="!isStepActive(2)"
+            >Profile Details</span
+          >
+        </div>
+
+        <div class="flex-1 h-px mx-4" [class.bg-[#CF6B4E]]="isStepCompleted(2)" [class.bg-gray-200]="!isStepCompleted(2)"></div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center relative">
+          <div
+            class="w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium"
+            [class.bg-[#CF6B4E]]="isStepActive(3) || isStepCompleted(3)"
+            [class.border-[#CF6B4E]]="isStepActive(3) || isStepCompleted(3)"
+            [class.text-white]="isStepActive(3) || isStepCompleted(3)"
+            [class.bg-white]="!isStepActive(3) && !isStepCompleted(3)"
+            [class.border-gray-200]="!isStepActive(3) && !isStepCompleted(3)"
+            [class.text-gray-400]="!isStepActive(3) && !isStepCompleted(3)"
+          >
+            @if (isStepCompleted(3)) {
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
+            } @else {
+              3
+            }
+          </div>
+          <span
+            class="text-xs font-medium mt-2 absolute top-8 whitespace-nowrap"
+            [class.text-gray-900]="isStepActive(3)"
+            [class.text-gray-400]="!isStepActive(3)"
+            >Complete</span
+          >
+        </div>
+      </div>
+
+      <!-- Title & Description -->
+      <div class="text-center mb-8 mt-10">
+        <h2 class="text-3xl font-serif text-gray-900 mb-2">{{ title() }}</h2>
+        <p class="text-sm text-gray-500">{{ subtitle() }}</p>
+      </div>
+
+      @if (currentStep() === 1) {
+        <app-signup-form (completed)="onAccountDetailsCompleted($event)"></app-signup-form>
+      } @else if (currentStep() === 2) {
+        @if (selectedRole() === UserRole.Studio) {
+          <app-createstudio [userId]="createdUserId()" (completed)="onProfileCreationCompleted()"></app-createstudio>
+        } @else {
+          <app-createconsumer [userId]="createdUserId()" (completed)="onProfileCreationCompleted()"></app-createconsumer>
+        }
+      }
+    </div>
+  </main>
+
+  <!-- Footer Security Text -->
+  <footer class="pb-6 text-center">
+    <div class="flex items-center justify-center gap-2">
+      <svg
+        class="h-4 w-4 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+        ></path>
+      </svg>
+      <span class="text-xs text-gray-500"
+        >Your information is secure and will never be shared.</span
+      >
+    </div>
+  </footer>
+</div>

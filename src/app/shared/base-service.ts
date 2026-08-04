@@ -9,4 +9,8 @@ export class BaseService {
     get(path: string, params: HttpParams = new HttpParams(), headers = new HttpHeaders()) : Observable<any> {
         return this.httpClient.get(path, { params, headers });
     }
+    
+    post(path: string, body: any, headers = new HttpHeaders()) : Observable<any> {
+        return this.httpClient.post(path, body, { headers });
+    }
 }
