@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { BaseService } from '../../shared/base-service';
-import { inject } from '@angular/core';
 import { CreateUser } from '../models/create.user';
 import { Observable } from 'rxjs';
 import { CreateStudio } from '../models/create.studio';
@@ -12,6 +12,27 @@ import { SingInUser } from '../models/signin.user';
   providedIn: 'root'
 })
 export class AuthService {
+    private readonly platformId = inject(PLATFORM_ID);
+
+    isAuthenticated(): boolean {
+        if (!isPlatformBrowser(this.platformId)) return false;
+        return document.cookie.split(';').some(c => c.trim().startsWith('lumora_access_token='));
+    }
+
+    storeTokens(accessToken: string, refreshToken: string, persist: boolean): void {
+        if (!isPlatformBrowser(this.platformId)) return;
+        const expires = persist
+            ? `; expires=${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString()}`
+            : '';
+        document.cookie = `lumora_access_token=${accessToken}; path=/; Secure; SameSite=Strict${expires}`;
+        document.cookie = `lumora_refresh_token=${refreshToken}; path=/; Secure; SameSite=Strict${expires}`;
+    }
+
+    clearTokens(): void {
+        if (!isPlatformBrowser(this.platformId)) return;
+        document.cookie = 'lumora_access_token=; path=/; max-age=0';
+        document.cookie = 'lumora_refresh_token=; path=/; max-age=0';
+    }
     private readonly baseUrl = `${environment.apiUrl}/auth`;
     protected baseService = inject(BaseService);
 

@@ -68,9 +68,7 @@ export class Login {
 
     this.authService.signInUser(email, password).subscribe({
       next: (response) => {
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem('lumora_access_token', response.accessToken);
-        storage.setItem('lumora_refresh_token', response.refreshToken);
+        this.authService.storeTokens(response.accessToken, response.refreshToken, rememberMe);
         this.isLoginSuccess.set(true);
         this.isSubmitting.set(false);
       },
