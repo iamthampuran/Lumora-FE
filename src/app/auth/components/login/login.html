@@ -94,7 +94,7 @@
         <p class="text-gray-500 text-sm">Login to your Lumora account</p>
       </div>
 
-      <form class="space-y-6">
+      <form [formGroup]="loginForm" (ngSubmit)="loginUser()" class="space-y-6" novalidate>
         
         <!-- Email Input -->
         <div>
@@ -103,8 +103,19 @@
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
               <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
             </div>
-            <input type="email" placeholder="Enter your email address" class="block w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400" />
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Enter your email address"
+              [attr.aria-invalid]="hasControlError('email', 'required') || hasControlError('email', 'email')"
+              class="block w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400"
+            />
           </div>
+          @if (hasControlError('email', 'required')) {
+            <p class="mt-2 text-xs text-red-600">Email is required.</p>
+          } @else if (hasControlError('email', 'email')) {
+            <p class="mt-2 text-xs text-red-600">Enter a valid email address.</p>
+          }
         </div>
 
         <!-- Password Input -->
@@ -116,7 +127,13 @@
             </div>
             
             <!-- Signal Binding for Input Type -->
-            <input [type]="showPassword() ? 'text' : 'password'" placeholder="Enter your password" class="block w-full pl-11 pr-11 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400" />
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter your password"
+              [attr.aria-invalid]="hasControlError('password', 'required') || hasControlError('password', 'minlength')"
+              class="block w-full pl-11 pr-11 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400"
+            />
             
             <!-- Signal Trigger Button -->
             <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
@@ -127,21 +144,46 @@
               }
             </button>
           </div>
+          @if (hasControlError('password', 'required')) {
+            <p class="mt-2 text-xs text-red-600">Password is required.</p>
+          } @else if (hasControlError('password', 'minlength')) {
+            <p class="mt-2 text-xs text-red-600">Password must be at least 8 characters.</p>
+          }
         </div>
 
         <!-- Options -->
         <div class="flex items-center justify-between pt-1">
           <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" class="w-4 h-4 cursor-pointer rounded border-gray-300 text-[#CF6B4E] focus:ring-[#CF6B4E]" />
+            <input type="checkbox" formControlName="rememberMe" class="w-4 h-4 cursor-pointer rounded border-gray-300 text-[#CF6B4E] focus:ring-[#CF6B4E]" />
             <span class="text-sm text-gray-600">Remember me</span>
           </label>
           <a href="#" class="text-sm font-medium text-[#CF6B4E] hover:underline cursor-pointer">Forgot password?</a>
         </div>
 
+        @if (errorMessage()) {
+          <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p class="text-sm text-red-700">{{ errorMessage() }}</p>
+          </div>
+        }
+
+        @if (isLoginSuccess()) {
+          <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+            <p class="text-sm text-green-700">Login successful.</p>
+          </div>
+        }
+
         <!-- Submit -->
         <div class="pt-4">
-          <button type="submit" class="w-full flex justify-center py-3.5 px-4 rounded-xl shadow-sm text-sm font-medium text-white bg-[#C45A3E] hover:bg-[#b04a2e] transition-colors cursor-pointer">
-            Login
+          <button
+            type="submit"
+            [disabled]="isSubmitting()"
+            class="w-full flex justify-center py-3.5 px-4 rounded-xl shadow-sm text-sm font-medium text-white bg-[#C45A3E] hover:bg-[#b04a2e] transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            @if (isSubmitting()) {
+              Signing in...
+            } @else {
+              Login
+            }
           </button>
         </div>
       </form>
@@ -153,8 +195,8 @@
         <div class="h-px bg-gray-200 flex-1"></div>
       </div>
 
-      <!-- Google Auth -->
-      <div class="mt-8">
+      <!-- Google Auth commenting now for future changes -->
+      <!-- <div class="mt-8">
         <button type="button" class="w-full flex justify-center items-center py-3.5 px-4 rounded-xl text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm cursor-pointer">
           <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -164,7 +206,7 @@
           </svg>
           Continue with Google
         </button>
-      </div>
+      </div> -->
 
       <p class="mt-8 text-center text-sm text-gray-600">
         Don't have an account?
