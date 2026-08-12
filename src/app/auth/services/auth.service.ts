@@ -44,24 +44,43 @@ export class AuthService {
     }
 
     getRole(): UserRole | null {
-        const token = this.getAccessToken();
-        if (!token) return null;
+        const payload = this.getTokenPayload();
+        if (!payload) return null;
 
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const raw: string | undefined = payload['role']
-                ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-            if (!raw) return null;
+        const raw: string | undefined = payload['role']
+            ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        if (!raw) return null;
 
-            switch (raw.toLowerCase()) {
-                case 'consumer': return UserRole.Cosnsumer;
-                case 'studio':   return UserRole.Studio;
-                case 'admin':    return UserRole.Admin;
-                default:         return null;
-            }
-        } catch {
-            return null;
+        switch (raw.toLowerCase()) {
+            case 'consumer': return UserRole.Cosnsumer;
+            case 'studio':   return UserRole.Studio;
+            case 'admin':    return UserRole.Admin;
+            default:         return null;
         }
+    }
+
+    getRoleScopedProfileId(): string | null {
+        const role = this.getRole();
+        const payload = this.getTokenPayload();
+        if (role === null || !payload) return null;
+
+        if (role === UserRole.Cosnsumer) {
+            return payload['consumerId']
+                ?? payload['consumerid']
+                ?? payload['consumer_id']
+                ?? payload['ConsumerId']
+                ?? null;
+        }
+
+        if (role === UserRole.Studio) {
+            return payload['studioId']
+                ?? payload['studioid']
+                ?? payload['studio_id']
+                ?? payload['StudioId']
+                ?? null;
+        }
+
+        return null;
     }
 
     getRoleDashboardPath(): string {
@@ -77,6 +96,18 @@ export class AuthService {
             .find(c => c.trim().startsWith('lumora_access_token='));
         return match ? match.trim().substring('lumora_access_token='.length) : null;
     }
+
+    private getTokenPayload(): Record<string, any> | null {
+        const token = this.getAccessToken();
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split('.')[1]));
+        } catch {
+            return null;
+        }
+    }
+
     private readonly baseUrl = `${environment.apiUrl}/auth`;
     protected baseService = inject(BaseService);
 

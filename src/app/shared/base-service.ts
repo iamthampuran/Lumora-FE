@@ -1,8 +1,10 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { inject, Service } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-@Service()
+@Injectable({
+    providedIn: 'root'
+})
 export class BaseService {
     protected httpClient = inject(HttpClient);
 
