@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { EventDashboard } from '../models/event-dashboard';
 import { EventStatus } from '../enums/event.status.enum';
 import { HttpParams } from '@angular/common/http';
+import { InquiryWidget } from '../models/inquiry-widget';
 
 @Injectable({
     providedIn: 'root'
@@ -22,4 +23,9 @@ export class ConsumerService {
         return this.baseService.get(baseUrl, queryParams);
     }
     
+    getInquiryWidgetDetails(consumerId: string) : Observable<InquiryWidget[]> {
+        const baseUrl = `${this.baseUrl}/${consumerId}/dashboard/inquiries`;
+        return this.baseService.get(baseUrl);
+    }
+
 }

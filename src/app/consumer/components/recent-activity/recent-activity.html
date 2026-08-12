@@ -1,29 +1,47 @@
 <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col h-full">
   <div class="flex justify-between items-center mb-6">
-    <h3 class="font-bold text-gray-900">Recent Activity</h3>
+    <h3 class="font-bold text-gray-900">Recent Inquiries</h3>
     <a href="#" class="text-[#CF6B4E] text-xs font-medium hover:underline">View all</a>
   </div>
 
-  <!-- Activity List -->
-  <div class="space-y-6 flex-1">
-    @for (activity of activities; track activity.id) {
-      <div class="flex gap-4">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 {{ activity.bgColor }} {{ activity.iconColor }}">
-          <div class="w-4 h-4 bg-current rounded-sm opacity-50"></div>
-        </div>
-        <div class="flex-1 pb-4 border-b border-gray-50 last:border-0 last:pb-0">
-          <div class="flex justify-between items-start mb-1">
-            <p class="text-xs text-gray-500">{{ activity.title }}</p>
-            <span class="text-[10px] text-gray-400 whitespace-nowrap ml-2">{{ activity.time }}</span>
+  @if (hasInquiries()) {
+    <div class="space-y-4 flex-1">
+      @for (inquiry of inquiryCards(); track inquiry.inquiryId) {
+        <div class="flex gap-3 pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+          <div class="w-8 h-8 rounded-full bg-orange-50 text-[#8C5A2B] flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           </div>
-          <p class="text-sm font-bold text-gray-900">{{ activity.target }}</p>
-        </div>
-      </div>
-    }
-  </div>
 
-  <button class="w-full mt-6 py-3 border border-orange-200 text-[#CF6B4E] rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors flex justify-center items-center gap-2">
-    View All Activity
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-  </button>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-start gap-2">
+              <p class="text-sm font-bold text-gray-900 truncate">{{ inquiry.eventName }}</p>
+              <span class="text-[11px] text-gray-400 whitespace-nowrap">{{ inquiry.modifiedLabel }}</span>
+            </div>
+
+            <p class="text-xs text-gray-600">{{ inquiry.studioName }}</p>
+
+            <div class="mt-1 flex items-center text-[11px] text-gray-500 gap-3">
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                {{ inquiry.eventDateLabel }}
+              </span>
+            </div>
+          </div>
+
+          <button type="button" class="self-center p-1 text-gray-400 hover:text-gray-700" aria-label="Open inquiry">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+      }
+    </div>
+
+    <button class="w-full mt-6 py-3 border border-orange-200 text-[#CF6B4E] rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors flex justify-center items-center gap-2">
+      View All Inquiries
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+    </button>
+  } @else {
+    <div class="flex-1 flex items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50/60 px-4 py-8 text-center">
+      <p class="text-sm text-gray-500">No inquiry updates for now.</p>
+    </div>
+  }
 </div>
