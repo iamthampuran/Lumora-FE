@@ -3,3 +3,9 @@ export enum UserRole {
     Studio = 1,
     Admin = 2
 }
+
+export enum UserRoleString {
+    Cosnsumer = 'Consumer',
+    Studio = 'Studio',
+    Admin = 'Admin'
+}

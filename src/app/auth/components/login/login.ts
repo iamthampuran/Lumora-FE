@@ -71,6 +71,7 @@ export class Login {
         this.authService.storeTokens(response.accessToken, response.refreshToken, rememberMe);
         this.isLoginSuccess.set(true);
         this.isSubmitting.set(false);
+        void this.router.navigate([this.authService.getRoleDashboardPath()]);
       },
       error: (error: unknown) => {
         this.errorMessage.set(this.getErrorMessage(error));
