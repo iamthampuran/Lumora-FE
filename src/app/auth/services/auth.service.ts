@@ -2,6 +2,7 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
 import { BaseService } from '../../shared/base-service';
+import { UserRole } from '../enums/UserRole';
 import { CreateUser } from '../models/create.user';
 import { Observable } from 'rxjs';
 import { CreateStudio } from '../models/create.studio';
@@ -16,7 +17,15 @@ export class AuthService {
 
     isAuthenticated(): boolean {
         if (!isPlatformBrowser(this.platformId)) return false;
-        return document.cookie.split(';').some(c => c.trim().startsWith('lumora_access_token='));
+        const token = this.getAccessToken();
+        if (!token) return false;
+
+        try {
+            const { exp } = JSON.parse(atob(token.split('.')[1]));
+            return typeof exp === 'number' && Date.now() < exp * 1000;
+        } catch {
+            return false;
+        }
     }
 
     storeTokens(accessToken: string, refreshToken: string, persist: boolean): void {
@@ -33,6 +42,72 @@ export class AuthService {
         document.cookie = 'lumora_access_token=; path=/; max-age=0';
         document.cookie = 'lumora_refresh_token=; path=/; max-age=0';
     }
+
+    getRole(): UserRole | null {
+        const payload = this.getTokenPayload();
+        if (!payload) return null;
+
+        const raw: string | undefined = payload['role']
+            ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        if (!raw) return null;
+
+        switch (raw.toLowerCase()) {
+            case 'consumer': return UserRole.Cosnsumer;
+            case 'studio':   return UserRole.Studio;
+            case 'admin':    return UserRole.Admin;
+            default:         return null;
+        }
+    }
+
+    getRoleScopedProfileId(): string | null {
+        const role = this.getRole();
+        const payload = this.getTokenPayload();
+        if (role === null || !payload) return null;
+
+        if (role === UserRole.Cosnsumer) {
+            return payload['consumerId']
+                ?? payload['consumerid']
+                ?? payload['consumer_id']
+                ?? payload['ConsumerId']
+                ?? null;
+        }
+
+        if (role === UserRole.Studio) {
+            return payload['studioId']
+                ?? payload['studioid']
+                ?? payload['studio_id']
+                ?? payload['StudioId']
+                ?? null;
+        }
+
+        return null;
+    }
+
+    getRoleDashboardPath(): string {
+        const role = this.getRole();
+        if (role === UserRole.Cosnsumer) return '/consumer/dashboard';
+        if (role === UserRole.Studio)   return '/studio';
+        return '/login';
+    }
+
+    private getAccessToken(): string | null {
+        if (!isPlatformBrowser(this.platformId)) return null;
+        const match = document.cookie.split(';')
+            .find(c => c.trim().startsWith('lumora_access_token='));
+        return match ? match.trim().substring('lumora_access_token='.length) : null;
+    }
+
+    private getTokenPayload(): Record<string, any> | null {
+        const token = this.getAccessToken();
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split('.')[1]));
+        } catch {
+            return null;
+        }
+    }
+
     private readonly baseUrl = `${environment.apiUrl}/auth`;
     protected baseService = inject(BaseService);
 
