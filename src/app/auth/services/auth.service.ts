@@ -152,4 +152,19 @@ export class AuthService {
         const body = { "Email": email, "Password": password };
         return this.baseService.post(url, body);
     }
+
+    logoutUser() : Observable<number> {
+        var payload = this.getTokenPayload();
+        if (!payload || payload == null) {
+            console.error('User is not authenticated');
+        }
+        var userId = payload?.["nameid"]
+        const url = `${this.baseUrl}/logout/${userId}`;
+        return this.baseService.delete(url);
+    }
+
+    getUserDetailsFromToken(key: string): any {
+        const payload = this.getTokenPayload();
+        return payload ? payload[key] : null;
+    }
 }

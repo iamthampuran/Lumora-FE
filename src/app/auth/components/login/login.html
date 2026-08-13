@@ -1,17 +1,29 @@
 <div class="min-h-screen bg-[#FDFBF9] font-sans flex flex-col items-center py-6 px-4">
-  
   <!-- Top Navigation -->
   <header class="w-full max-w-6xl mx-auto flex justify-between items-center mb-6">
     <!-- Logo -->
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-full border border-orange-200 flex items-center justify-center text-[#CF6B4E] bg-white">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      <div
+        class="w-10 h-10 rounded-full border border-orange-200 flex items-center justify-center text-[#CF6B4E] bg-white"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       </div>
       <div>
         <h1 class="text-xl font-serif font-bold tracking-widest text-gray-900 uppercase">Lumora</h1>
-        <p class="text-[10px] tracking-[0.2em] text-gray-400 uppercase font-medium">Capturing Stories</p>
+        <p class="text-[10px] tracking-[0.2em] text-gray-400 uppercase font-medium">
+          Capturing Stories
+        </p>
       </div>
     </div>
 
@@ -24,38 +36,76 @@
     </nav> -->
 
     <!-- Sign Up Button -->
-    <button type="button" (click)="goToSignup()" class="px-5 py-2 text-sm font-medium text-[#CF6B4E] border border-[#CF6B4E] rounded-lg hover:bg-orange-50 transition-colors cursor-pointer">
+    <button
+      type="button"
+      (click)="goToSignup()"
+      class="px-5 py-2 text-sm font-medium text-[#CF6B4E] border border-[#CF6B4E] rounded-lg hover:bg-orange-50 transition-colors cursor-pointer"
+    >
       Sign Up
     </button>
   </header>
 
   <!-- Main Split Card -->
-  <main class="w-full max-w-5xl bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row overflow-hidden mb-8">
-    
+  <main
+    class="w-full max-w-5xl bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row overflow-hidden mb-8"
+  >
     <!-- Left Panel (Beige) -->
-    <div class="w-full md:w-[45%] bg-[#FAF8F5] p-10 md:p-14 flex flex-col items-center justify-center text-center">
-      
+    <div
+      class="w-full md:w-[45%] bg-[#FAF8F5] p-10 md:p-14 flex flex-col items-center justify-center text-center"
+    >
       <!-- Big Logo Area -->
       <div class="mb-6 text-[#CF6B4E]">
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        <svg
+          width="80"
+          height="80"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       </div>
-      <h2 class="text-3xl font-serif font-bold tracking-widest text-gray-900 uppercase mb-1">Lumora</h2>
-      <p class="text-[11px] tracking-[0.25em] text-gray-500 uppercase font-medium mb-8">Capturing Stories</p>
+      <h2 class="text-3xl font-serif font-bold tracking-widest text-gray-900 uppercase mb-1">
+        Lumora
+      </h2>
+      <p class="text-[11px] tracking-[0.25em] text-gray-500 uppercase font-medium mb-8">
+        Capturing Stories
+      </p>
 
       <div class="w-12 h-px bg-gray-300 mb-8"></div>
 
       <p class="text-sm text-gray-600 leading-relaxed mb-12 max-w-xs">
-        Welcome back! Log in to continue your journey of capturing and celebrating beautiful moments.
+        Welcome back! Log in to continue your journey of capturing and celebrating beautiful
+        moments.
       </p>
 
       <!-- Feature List -->
       <div class="space-y-8 text-left w-full max-w-70">
-        
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-orange-100/50 flex items-center justify-center text-[#CF6B4E] shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"></path></svg>
+          <div
+            class="w-10 h-10 rounded-full bg-orange-100/50 flex items-center justify-center text-[#CF6B4E] shrink-0"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"
+              ></path>
+            </svg>
           </div>
           <div>
             <p class="text-sm font-medium text-gray-900">Discover amazing studios</p>
@@ -64,8 +114,22 @@
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-orange-100/50 flex items-center justify-center text-[#CF6B4E] shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path></svg>
+          <div
+            class="w-10 h-10 rounded-full bg-orange-100/50 flex items-center justify-center text-[#CF6B4E] shrink-0"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"
+              ></path>
+            </svg>
           </div>
           <div>
             <p class="text-sm font-medium text-gray-900">Manage your events</p>
@@ -74,40 +138,75 @@
         </div>
 
         <div class="flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-orange-100/50 flex items-center justify-center text-[#CF6B4E] shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path></svg>
+          <div
+            class="w-10 h-10 rounded-full bg-orange-100/50 flex items-center justify-center text-[#CF6B4E] shrink-0"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+              ></path>
+            </svg>
           </div>
           <div>
             <p class="text-sm font-medium text-gray-900">Secure payments and</p>
             <p class="text-xs text-gray-500 mt-0.5">trusted experiences.</p>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- Right Panel (Form) -->
     <div class="w-full md:w-[55%] p-10 md:p-16 flex flex-col justify-center">
-      
       <div class="mb-10">
         <h2 class="text-4xl font-serif text-gray-900 mb-2">Welcome back</h2>
         <p class="text-gray-500 text-sm">Login to your Lumora account</p>
       </div>
 
-      <form [formGroup]="loginForm" (ngSubmit)="loginUser()" class="space-y-6" novalidate>
-        
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="loginUser()"
+        class="space-y-6"
+        novalidate
+        [attr.aria-busy]="isSubmitting()"
+      >
         <!-- Email Input -->
         <div>
-          <label class="block text-sm font-bold text-gray-900 mb-2">Email address <span class="text-[#CF6B4E]">*</span></label>
+          <label class="block text-sm font-bold text-gray-900 mb-2"
+            >Email address <span class="text-[#CF6B4E]">*</span></label
+          >
           <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
+            <div
+              class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"
+            >
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                ></path>
+              </svg>
             </div>
             <input
               type="email"
               formControlName="email"
               placeholder="Enter your email address"
-              [attr.aria-invalid]="hasControlError('email', 'required') || hasControlError('email', 'email')"
+              [attr.aria-invalid]="
+                hasControlError('email', 'required') || hasControlError('email', 'email')
+              "
               class="block w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400"
             />
           </div>
@@ -120,27 +219,78 @@
 
         <!-- Password Input -->
         <div>
-          <label class="block text-sm font-bold text-gray-900 mb-2">Password <span class="text-[#CF6B4E]">*</span></label>
+          <label class="block text-sm font-bold text-gray-900 mb-2"
+            >Password <span class="text-[#CF6B4E]">*</span></label
+          >
           <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path></svg>
+            <div
+              class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"
+            >
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                ></path>
+              </svg>
             </div>
-            
+
             <!-- Signal Binding for Input Type -->
             <input
               [type]="showPassword() ? 'text' : 'password'"
               formControlName="password"
               placeholder="Enter your password"
-              [attr.aria-invalid]="hasControlError('password', 'required') || hasControlError('password', 'minlength')"
+              [attr.aria-invalid]="
+                hasControlError('password', 'required') || hasControlError('password', 'minlength')
+              "
               class="block w-full pl-11 pr-11 py-3 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900 placeholder-gray-400"
             />
-            
+
             <!-- Signal Trigger Button -->
-            <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer">
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
+            >
               @if (showPassword()) {
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"></path></svg>
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                  ></path>
+                </svg>
               } @else {
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                  ></path>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  ></path>
+                </svg>
               }
             </button>
           </div>
@@ -154,10 +304,16 @@
         <!-- Options -->
         <div class="flex items-center justify-between pt-1">
           <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" formControlName="rememberMe" class="w-4 h-4 cursor-pointer rounded border-gray-300 text-[#CF6B4E] focus:ring-[#CF6B4E]" />
+            <input
+              type="checkbox"
+              formControlName="rememberMe"
+              class="w-4 h-4 cursor-pointer rounded border-gray-300 text-[#CF6B4E] focus:ring-[#CF6B4E]"
+            />
             <span class="text-sm text-gray-600">Remember me</span>
           </label>
-          <a href="#" class="text-sm font-medium text-[#CF6B4E] hover:underline cursor-pointer">Forgot password?</a>
+          <a href="#" class="text-sm font-medium text-[#CF6B4E] hover:underline cursor-pointer"
+            >Forgot password?</a
+          >
         </div>
 
         @if (errorMessage()) {
@@ -218,14 +374,26 @@
           Sign up
         </button>
       </p>
-
     </div>
   </main>
 
   <!-- Footer -->
   <footer class="text-center mt-auto pb-4">
     <p class="text-xs text-gray-500 font-medium">
-      By continuing, you agree to our <a href="#" class="text-[#CF6B4E] hover:underline">Terms of Service</a> and <a href="#" class="text-[#CF6B4E] hover:underline">Privacy Policy</a>.
+      By continuing, you agree to our
+      <a href="#" class="text-[#CF6B4E] hover:underline">Terms of Service</a> and
+      <a href="#" class="text-[#CF6B4E] hover:underline">Privacy Policy</a>.
     </p>
   </footer>
 </div>
+
+@if (isSubmitting()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-[1px]"
+    role="status"
+    aria-live="polite"
+    aria-label="Signing in"
+  >
+    <app-loader text="signing in"></app-loader>
+  </div>
+}

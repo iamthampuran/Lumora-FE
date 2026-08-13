@@ -3,10 +3,12 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LoaderComponent } from '../../../shared/components/loader/loader';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LoaderComponent],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -66,16 +68,17 @@ export class Login {
 
     this.isSubmitting.set(true);
 
-    this.authService.signInUser(email, password).subscribe({
+    this.authService
+    .signInUser(email, password)
+    .pipe(finalize(() => this.isSubmitting.set(false)))
+    .subscribe({
       next: (response) => {
         this.authService.storeTokens(response.accessToken, response.refreshToken, rememberMe);
         this.isLoginSuccess.set(true);
-        this.isSubmitting.set(false);
         void this.router.navigate([this.authService.getRoleDashboardPath()]);
       },
       error: (error: unknown) => {
         this.errorMessage.set(this.getErrorMessage(error));
-        this.isSubmitting.set(false);
       },
     });
   }
