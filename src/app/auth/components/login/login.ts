@@ -85,6 +85,14 @@ export class Login {
 
   private getErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
+      if (error.status === 404) {
+        return 'User not found';
+      }
+
+      if (error.status >= 400 && error.status < 500) {
+        return 'Invalid credentials entered';
+      }
+
       if (typeof error.error === 'string' && error.error.trim().length > 0) {
         return error.error;
       }

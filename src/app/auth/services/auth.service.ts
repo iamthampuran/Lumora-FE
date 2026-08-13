@@ -17,24 +17,25 @@ export class AuthService {
 
     isAuthenticated(): boolean {
         if (!isPlatformBrowser(this.platformId)) return false;
-        const token = this.getAccessToken();
-        if (!token) return false;
+        const payload = this.getTokenPayload();
+        if (!payload) return false;
 
-        try {
-            const { exp } = JSON.parse(atob(token.split('.')[1]));
-            return typeof exp === 'number' && Date.now() < exp * 1000;
-        } catch {
-            return false;
-        }
+        const expRaw = payload['exp'];
+        const exp = typeof expRaw === 'number' ? expRaw : Number(expRaw);
+        return Number.isFinite(exp) && Date.now() < exp * 1000;
     }
 
     storeTokens(accessToken: string, refreshToken: string, persist: boolean): void {
         if (!isPlatformBrowser(this.platformId)) return;
+
+        const isHttps = window.location.protocol === 'https:';
+        const securityFlags = isHttps ? '; Secure; SameSite=Strict' : '; SameSite=Lax';
+
         const expires = persist
             ? `; expires=${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString()}`
             : '';
-        document.cookie = `lumora_access_token=${accessToken}; path=/; Secure; SameSite=Strict${expires}`;
-        document.cookie = `lumora_refresh_token=${refreshToken}; path=/; Secure; SameSite=Strict${expires}`;
+        document.cookie = `lumora_access_token=${accessToken}; path=/${securityFlags}${expires}`;
+        document.cookie = `lumora_refresh_token=${refreshToken}; path=/${securityFlags}${expires}`;
     }
 
     clearTokens(): void {
@@ -47,16 +48,24 @@ export class AuthService {
         const payload = this.getTokenPayload();
         if (!payload) return null;
 
-        const raw: string | undefined = payload['role']
-            ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        const raw = this.getStringClaim(payload, [
+            'role',
+            'roles',
+            'Role',
+            'Roles',
+            'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
+            'http://schemas.microsoft.com/ws/2008/06/identity/claims/Role',
+        ]);
+
         if (!raw) return null;
 
-        switch (raw.toLowerCase()) {
-            case 'consumer': return UserRole.Cosnsumer;
-            case 'studio':   return UserRole.Studio;
-            case 'admin':    return UserRole.Admin;
-            default:         return null;
-        }
+        const normalizedRole = raw.trim().toLowerCase();
+
+        if (normalizedRole.includes('consumer')) return UserRole.Cosnsumer;
+        if (normalizedRole.includes('studio')) return UserRole.Studio;
+        if (normalizedRole.includes('admin')) return UserRole.Admin;
+
+        return null;
     }
 
     getRoleScopedProfileId(): string | null {
@@ -102,10 +111,36 @@ export class AuthService {
         if (!token) return null;
 
         try {
-            return JSON.parse(atob(token.split('.')[1]));
+            const payloadSegment = token.split('.')[1];
+            if (!payloadSegment) return null;
+
+            const decodedPayload = this.decodeBase64Url(payloadSegment);
+            return JSON.parse(decodedPayload);
         } catch {
             return null;
         }
+    }
+
+    private decodeBase64Url(value: string): string {
+        const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+        const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+        return atob(base64 + padding);
+    }
+
+    private getStringClaim(payload: Record<string, any>, claimKeys: string[]): string | null {
+        for (const key of claimKeys) {
+            const claimValue = payload[key];
+
+            if (typeof claimValue === 'string' && claimValue.trim().length > 0) {
+                return claimValue;
+            }
+
+            if (Array.isArray(claimValue) && typeof claimValue[0] === 'string') {
+                return claimValue[0];
+            }
+        }
+
+        return null;
     }
 
     private readonly baseUrl = `${environment.apiUrl}/auth`;

@@ -37,7 +37,14 @@
         [attr.aria-expanded]="isProfileMenuOpen()"
         class="w-full flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg px-1 py-1">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-[#EAE2D8] text-[#8C6C52] flex items-center justify-center font-bold text-sm">C</div>
+          @if(!profileUrl()) {
+            <div class="w-8 h-8 rounded-full bg-[#EAE2D8] text-[#8C6C52] flex items-center justify-center font-bold text-sm">
+              C
+            </div>
+          } @else {
+            <img [src]="profileUrl()" alt="Profile" class="w-8 h-8 rounded-full" />
+
+          }
           <div>
             <p class="text-sm font-bold text-gray-900">{{ userName() }}</p>
             <p class="text-[10px] text-gray-500">View Profile</p>
@@ -67,7 +74,12 @@
 </aside>
 
 @if (isLoggingOut()) {
-  <div class="mt-2">
-    <app-loader text="signing out"></app-loader>
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-white/65 backdrop-blur-[1px]"
+    role="status"
+    aria-live="polite"
+    aria-label="Signing out"
+  >
+    <app-loader text="loading"></app-loader>
   </div>
 }
