@@ -5,13 +5,13 @@ import { ConsumerTopbar } from '../topbar/topbar';
 import { ConsumerRecentActivity } from '../recent-activity/recent-activity';
 import { EventTabs } from "../event-tabs/event-tabs";
 import { EventStatus } from '../../enums/event.status.enum';
-import { DashboardStatsRow } from '../stats-row/stats-row';
+import { DashboardStatsRowComponent } from '../stats-row/stats-row';
 import { AuthService } from '../../../auth/services/auth.service';
 import { EventDashboard } from '../../models/event-dashboard';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ConsumerSidebar, ConsumerTopbar, ConsumerRecentActivity, EventTabs, DashboardStatsRow],
+  imports: [ConsumerSidebar, ConsumerTopbar, ConsumerRecentActivity, EventTabs, DashboardStatsRowComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

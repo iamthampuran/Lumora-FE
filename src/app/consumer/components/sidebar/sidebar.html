@@ -37,9 +37,16 @@
         [attr.aria-expanded]="isProfileMenuOpen()"
         class="w-full flex items-center justify-between cursor-pointer hover:bg-gray-50 rounded-lg px-1 py-1">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-[#EAE2D8] text-[#8C6C52] flex items-center justify-center font-bold text-sm">C</div>
+          @if(!profileUrl()) {
+            <div class="w-8 h-8 rounded-full bg-[#EAE2D8] text-[#8C6C52] flex items-center justify-center font-bold text-sm">
+              C
+            </div>
+          } @else {
+            <img [src]="profileUrl()" alt="Profile" class="w-8 h-8 rounded-full" />
+
+          }
           <div>
-            <p class="text-sm font-bold text-gray-900">Consumer</p>
+            <p class="text-sm font-bold text-gray-900">{{ userName() }}</p>
             <p class="text-[10px] text-gray-500">View Profile</p>
           </div>
         </div>
@@ -48,12 +55,31 @@
 
       @if (isProfileMenuOpen()) {
         <div class="mt-3 pt-3 border-t border-gray-100">
-          <button class="flex items-center gap-3 px-1 py-2 text-gray-600 hover:text-gray-900 font-medium text-sm w-full transition-colors cursor-pointer">
+          <button class="flex items-center gap-3 px-1 py-2 text-gray-600 hover:text-gray-900 font-medium text-sm w-full 
+          transition-colors cursor-pointer" (click)="logoutUser()"
+          [disabled]="isLoggingOut()"
+          [attr.aria-busy]="isLoggingOut()">
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            Sign out
+            @if(isLoggingOut()) {
+              Signing out...
+            }
+            @else {
+              Sign Out
+            }
           </button>
         </div>
       }
     </div>
   </div>
 </aside>
+
+@if (isLoggingOut()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-white/65 backdrop-blur-[1px]"
+    role="status"
+    aria-live="polite"
+    aria-label="Signing out"
+  >
+    <app-loader text="loading"></app-loader>
+  </div>
+}
