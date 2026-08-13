@@ -1,0 +1,281 @@
+<div class="min-h-screen bg-[#FDFBF9] font-sans flex flex-col">
+  
+  <header class="flex justify-between items-center px-8 py-4 border-b border-gray-100 bg-white sticky top-0 z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full border border-orange-200 flex items-center justify-center text-[#CF6B4E] bg-white">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <h1 class="text-lg font-bold tracking-widest text-gray-900 uppercase">Lumora</h1>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-3xl w-full mx-auto px-6 py-12">
+    
+    <!-- Title & Horizontal Stepper -->
+    <div class="mb-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+        <div>
+          <h2 class="text-3xl font-serif text-gray-900 mb-2">Create New Event</h2>
+          <p class="text-sm text-gray-500">
+            @switch (currentStep()) {
+              @case (1) { Let's start with the basics of your event. }
+              @case (2) { Tell us where the magic is happening. }
+              @case (3) { Help us match you with the right aesthetic. }
+              @case (4) { Please review the event details carefully before finalizing. }
+            }
+          </p>
+        </div>
+        
+        <div class="text-right">
+          <p class="text-sm font-medium text-[#CF6B4E] mb-1">Step {{ currentStep() }} of 4</p>
+          <p class="text-xs font-bold text-[#CF6B4E] tracking-widest uppercase">
+            @switch (currentStep()) {
+              @case (1) { Event Basics }
+              @case (2) { Location }
+              @case (3) { Style & Preferences }
+              @case (4) { Review & Confirm }
+            }
+          </p>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        @for (step of [1, 2, 3, 4]; track step) {
+          <div class="h-1.5 flex-1 rounded-full transition-colors duration-300" [ngClass]="step <= currentStep() ? 'bg-[#CF6B4E]' : 'bg-orange-50'" ></div>
+        }
+      </div>
+    </div>
+
+    <!-- The Master Form Wrapper -->
+    <form [formGroup]="eventForm" (ngSubmit)="submitEvent()" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-10">
+      
+      @switch (currentStep()) {
+        
+        <!-- STEP 1: BASICS -->
+        @case (1) {
+          <div formGroupName="basics" class="space-y-6">
+            <h3 class="text-xl font-serif text-gray-900 mb-6">Tell us about your event</h3>
+            
+            <div>
+              <label class="block text-xs font-bold text-gray-900 tracking-wide uppercase mb-2">Event Title *</label>
+              <input type="text" formControlName="title" placeholder="e.g. Smith Family Reunion" 
+                class="w-full px-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none transition-colors"
+                [class.border-red-400]="isInvalid('basics.title')"
+                [class.border-gray-200]="!isInvalid('basics.title')" />
+              @if (isInvalid('basics.title')) { <p class="text-xs text-red-500 mt-1.5 font-medium">Event title is required.</p> }
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-gray-900 tracking-wide uppercase mb-2">Event Category *</label>
+              <select formControlName="category" 
+                class="w-full px-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none appearance-none bg-white"
+                [class.border-red-400]="isInvalid('basics.category')"
+                [class.border-gray-200]="!isInvalid('basics.category')">
+                <option value="" disabled>Select a category</option>
+                <option value="Wedding">Wedding</option>
+                <option value="Corporate">Corporate</option>
+                <option value="Portrait">Portrait</option>
+              </select>
+              @if (isInvalid('basics.category')) { <p class="text-xs text-red-500 mt-1.5 font-medium">Please select a category.</p> }
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-900 tracking-wide uppercase mb-2">Budget (INR) *</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">₹</span>
+                <input type="number" formControlName="budget" placeholder="0.00" 
+                  class="w-full pl-8 pr-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] outline-none"
+                  [class.border-red-400]="isInvalid('basics.budget')"
+                  [class.border-gray-200]="!isInvalid('basics.budget')" />
+              </div>
+              @if (isInvalid('basics.budget')) { <p class="text-xs text-red-500 mt-1.5 font-medium">Valid budget is required (Min ₹1000).</p> }
+            </div>
+          </div>
+        }
+
+        <!-- STEP 2: LOCATION -->
+        @case (2) {
+          <div formGroupName="location">
+            <div class="text-center mb-6">
+              <h3 class="text-2xl font-serif text-gray-900 mb-2">Where is your event taking place?</h3>
+              <p class="text-sm text-gray-500">We'll use this to recommend nearby studios.</p>
+            </div>
+            
+            <div class="flex gap-4 mb-2">
+              <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" formControlName="venue" placeholder="Enter event location or city" 
+                  class="w-full pl-10 pr-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] outline-none"
+                  [class.border-red-400]="isInvalid('location.venue')"
+                  [class.border-gray-200]="!isInvalid('location.venue')" />
+              </div>
+            </div>
+            @if (isInvalid('location.venue')) { <p class="text-xs text-red-500 mb-4 font-medium">Please provide a location.</p> }
+
+            <div class="w-full h-80 bg-[#e5e3df] rounded-xl border border-gray-200 mt-4 relative overflow-hidden flex items-center justify-center">
+              <svg class="w-10 h-10 text-[#C45A3E] absolute drop-shadow-md z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+          </div>
+        }
+
+        <!-- STEP 3: STYLE & TAGS -->
+        @case (3) {
+          <div formGroupName="style">
+            <h3 class="text-2xl font-serif text-gray-900 mb-2">What style are you looking for?</h3>
+            <p class="text-sm text-gray-500 mb-8">Tags help us match you with studios that specialize in your preferred photography style.</p>
+
+            <div class="space-y-6">
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-sm font-bold text-gray-900">Selected Tags *</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  @for (tag of currentTags; track tag) {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-[#CF6B4E] rounded-lg text-sm font-medium">
+                      {{ tag }}
+                      <button type="button" (click)="removeTag(tag)" class="hover:bg-orange-200 rounded-full p-0.5 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                      </button>
+                    </span>
+                  }
+                </div>
+                @if (currentTags.length === 0) { <p class="text-xs text-red-500 mt-2 font-medium">Please select at least one tag.</p> }
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-gray-900 tracking-wide uppercase mb-3">Suggested Tags</label>
+                <div class="flex flex-wrap gap-2">
+                  @for (tag of suggestedTags; track tag) {
+                    <button type="button" (click)="addTag(tag)" class="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg text-sm hover:border-[#CF6B4E] hover:text-[#CF6B4E] transition-colors">
+                      {{ tag }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- STEP 4: REVIEW -->
+        @case (4) {
+          <div class="space-y-6">
+            
+            <!-- 1. Basics Card -->
+            <div class="border-l-[6px] border-l-[#CF6B4E] border border-gray-100 rounded-r-xl p-7 shadow-sm bg-white">
+              <div class="flex justify-between items-start mb-6">
+                <div class="flex items-center gap-3 text-gray-900 font-bold text-lg">
+                  <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-[#CF6B4E]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                  </div>
+                  Event Basics
+                </div>
+                <button type="button" (click)="goToStep(1)" class="text-[#CF6B4E] text-sm font-medium hover:underline flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  Edit
+                </button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div>
+                  <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1.5">Event Title</p>
+                  <p class="font-semibold text-gray-900 text-lg">{{ eventForm.value.basics?.title || 'Not specified' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1.5">Category</p>
+                  <p class="font-medium text-gray-700">{{ eventForm.value.basics?.category || 'Not specified' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mb-1.5">Budget</p>
+                  <p class="font-bold text-[#4B8b60] bg-green-50 px-3 py-1 rounded-lg inline-flex items-center gap-1">₹{{ eventForm.value.basics?.budget || '0' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Location Card -->
+            <div class="border-l-[6px] border-l-[#4B8b60] border border-gray-100 rounded-r-xl p-7 shadow-sm bg-white">
+              <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3 text-gray-900 font-bold text-lg">
+                  <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-[#4B8b60]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  </div>
+                  Location Details
+                </div>
+                <button type="button" (click)="goToStep(2)" class="text-[#CF6B4E] text-sm font-medium hover:underline flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  Edit
+                </button>
+              </div>
+              <p class="text-sm text-gray-500 mb-5">The primary venue and surrounding areas selected for the shoot.</p>
+              
+              <div class="bg-gray-50 rounded-xl p-4 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-0.5">Selected Venue</p>
+                  <p class="font-semibold text-gray-900">{{ eventForm.value.location?.venue || 'Not specified' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Style Card -->
+            <div class="border-l-[6px] border-l-[#6A5A8C] border border-gray-100 rounded-r-xl p-7 shadow-sm bg-white">
+              <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3 text-gray-900 font-bold text-lg">
+                  <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-[#6A5A8C]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  </div>
+                  Photography Style
+                </div>
+                <button type="button" (click)="goToStep(3)" class="text-[#CF6B4E] text-sm font-medium hover:underline flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  Edit
+                </button>
+              </div>
+              <p class="text-sm text-gray-500 mb-5">Confirmed visual aesthetic for the event.</p>
+              
+              <div class="flex flex-wrap gap-2.5">
+                @for (tag of currentTags; track tag) {
+                  <span class="px-4 py-2 rounded-xl text-sm font-medium bg-[#F4F3F8] text-[#6A5A8C]">
+                    {{ tag }}
+                  </span>
+                }
+                @if (currentTags.length === 0) {
+                  <span class="text-sm text-gray-400 italic">No tags selected.</span>
+                }
+              </div>
+            </div>
+
+          </div>
+        }
+      }
+
+      <!-- Bottom Navigation Buttons -->
+      <div class="mt-10 pt-6 border-t border-gray-100 flex justify-between items-center">
+        @if (currentStep() > 1) {
+          <button type="button" (click)="prevStep()" class="px-6 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm">
+            Back
+          </button>
+        } @else {
+          <button type="button" class="px-6 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm">
+            Cancel
+          </button>
+        }
+
+        @if (currentStep() < 4) {
+          <button type="button" (click)="nextStep()" 
+            [disabled]="!canGoNext()"
+            [class.opacity-50]="!canGoNext()" 
+            [class.cursor-not-allowed]="!canGoNext()"
+            class="px-8 py-3 bg-[#C45A3E] hover:bg-[#b04a2e] text-white font-medium rounded-xl transition-colors flex items-center gap-2 text-sm shadow-sm">
+            Next Step
+          </button>
+        } @else {
+          <button type="submit" [disabled]="eventForm.invalid" class="px-8 py-3 bg-[#C45A3E] hover:bg-[#b04a2e] text-white font-medium rounded-xl transition-colors flex items-center gap-2 text-sm shadow-sm">
+            Create Event
+          </button>
+        }
+      </div>
+
+    </form>
+  </main>
+</div>

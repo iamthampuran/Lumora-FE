@@ -8,6 +8,7 @@ import { EventStatus } from '../../enums/event.status.enum';
 import { DashboardStatsRowComponent } from '../stats-row/stats-row';
 import { AuthService } from '../../../auth/services/auth.service';
 import { EventDashboard } from '../../models/event-dashboard';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +20,7 @@ export class Dashboard implements OnInit {
 
   consumerService = inject(ConsumerService);
   authService = inject(AuthService);
+  private readonly router = inject(Router);
   pageSize = signal(10);
   pageCount = signal(1);
   consumerId : string = '';//fetch from cookie
@@ -37,6 +39,10 @@ export class Dashboard implements OnInit {
     const data = this.dataFetched();
     return data?.eventDetails ?? [];
   })
+
+  createEvent(): void {
+    this.router.navigate(['/consumer/create-event']);
+  }
 
   ngOnInit(): void {
     this.consumerId = this.authService.getRoleScopedProfileId() ?? ''; 
