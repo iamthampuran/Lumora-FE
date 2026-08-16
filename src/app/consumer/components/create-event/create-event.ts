@@ -30,13 +30,18 @@ export class CreateEvent {
       venue: ['', Validators.required]
     }),
     style: this.fb.group({
-      tags: [['#cinematic', '#documentary', '#moody'], Validators.required]
+      tags: [['#cinematic', '#documentary', '#moody'], Validators.required],
+      specialRequirements: ['', [Validators.maxLength(500)]]
     })
   });
   
   // Tag Management State
   suggestedTags = ['#candid', '#traditional', '#editorial', '#film', '#drone', '#corporate', '#wedding'];
   customTagInput = signal<string>('');
+
+  get specialRequirementsCount(): number {
+    return this.eventForm.get('style.specialRequirements')?.value?.length || 0;
+  }
 
   // Form Validation Helper
   canGoNext(): boolean {
