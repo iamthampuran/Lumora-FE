@@ -104,18 +104,19 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-gray-900 tracking-wide uppercase mb-2">Coverage Duration *</label>
-                <select formControlName="duration" 
-                  class="w-full px-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] outline-none appearance-none bg-white transition-colors"
+                <label class="block text-xs font-bold text-gray-900 tracking-wide uppercase mb-2">Coverage Duration (Hours) *</label>
+                
+                <input type="time" 
+                  [value]="durationTimeStr"
+                  (change)="onDurationChange($event)"
+                  step="900" 
+                  class="w-full px-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] outline-none bg-white transition-colors"
                   [class.border-red-400]="isInvalid('basics.duration')"
-                  [class.border-gray-200]="!isInvalid('basics.duration')">
-                  <option value="" disabled>Select duration</option>
-                  <option value="2 hours">2 hours</option>
-                  <option value="4 hours">4 hours (Half Day)</option>
-                  <option value="8 hours">8 hours (Full Day)</option>
-                  <option value="Multiple days">Multiple days</option>
-                </select>
-                @if (isInvalid('basics.duration')) { <p class="text-xs text-red-500 mt-1.5 font-medium">Please select a duration.</p> }
+                  [class.border-gray-200]="!isInvalid('basics.duration')" />
+                
+                <p class="text-[11px] text-gray-500 mt-1.5">Select duration (15-min intervals).</p>
+                
+                @if (isInvalid('basics.duration')) { <p class="text-xs text-red-500 mt-1.5 font-medium">Please select a valid duration.</p> }
               </div>
             </div>
 
@@ -133,28 +134,33 @@
           </div>
         }
 
-        <!-- STEP 2: LOCATION -->
+       <!-- STEP 2: LOCATION -->
         @case (2) {
           <div formGroupName="location">
             <div class="text-center mb-6">
               <h3 class="text-2xl font-serif text-gray-900 mb-2">Where is your event taking place?</h3>
-              <p class="text-sm text-gray-500">We'll use this to recommend nearby studios.</p>
+              <p class="text-sm text-gray-500">Search for a venue or pinpoint the exact location on the map.</p>
             </div>
             
-            <div class="flex gap-4 mb-2">
-              <div class="relative flex-1">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" formControlName="venue" placeholder="Enter event location or city" 
-                  class="w-full pl-10 pr-4 py-3 text-sm border rounded-xl focus:ring-1 focus:ring-[#CF6B4E] outline-none"
-                  [class.border-red-400]="isInvalid('location.venue')"
-                  [class.border-gray-200]="!isInvalid('location.venue')" />
+            <!-- Read-only display of the selected venue so the user sees what is saved -->
+            <div class="mb-4">
+              <p class="text-xs font-bold text-gray-900 tracking-wide uppercase mb-2">Selected Venue</p>
+              <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
+                {{ eventForm.get('location.venue')?.value || 'No location selected yet' }}
               </div>
             </div>
-            @if (isInvalid('location.venue')) { <p class="text-xs text-red-500 mb-4 font-medium">Please provide a location.</p> }
 
-            <div class="w-full h-80 bg-[#e5e3df] rounded-xl border border-gray-200 mt-4 relative overflow-hidden flex items-center justify-center">
-              <svg class="w-10 h-10 text-[#C45A3E] absolute drop-shadow-md z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <!-- Leaflet Map Container -->
+            <!-- z-0 ensures the map doesn't overlap your sticky headers -->
+            <div 
+              #mapContainer 
+              class="w-full h-96 rounded-xl border border-gray-200 relative overflow-hidden z-0">
             </div>
+
+            <!-- Validation -->
+            @if (eventForm.get('location.latitude')?.invalid && (eventForm.get('location.latitude')?.touched || eventForm.get('location.latitude')?.dirty)) { 
+              <p class="text-xs text-red-500 mt-2 font-medium">Please select or pinpoint an exact location on the map.</p> 
+            }
           </div>
         }
 
@@ -272,7 +278,7 @@
                   </div>
                   <div>
                     <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Duration</p>
-                    <p class="font-medium text-gray-900">{{ eventForm.value.basics?.duration || 'Not specified' }}</p>
+                    <p class="font-medium text-gray-900">{{ formattedDuration }}</p>
                   </div>
                 </div>
               </div>
@@ -351,7 +357,7 @@
             Back
           </button>
         } @else {
-          <button type="button" class="px-6 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm">
+          <button type="button" (click)="cancelClicked()" class="px-6 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm cursor-pointer" >
             Cancel
           </button>
         }
