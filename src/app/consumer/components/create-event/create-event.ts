@@ -11,6 +11,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 })
 export class CreateEvent {
   private fb = inject(FormBuilder);
+  private readonly otherCategoryValue = 'Other';
 
   // Navigation State
   currentStep = signal<number>(1);
@@ -20,6 +21,9 @@ export class CreateEvent {
     basics: this.fb.group({
       title: ['', Validators.required],
       category: ['', Validators.required],
+      customCategory: [''],
+      date: ['', Validators.required],
+      duration: ['', Validators.required],
       budget: [null, [Validators.required, Validators.min(1000)]]
     }),
     location: this.fb.group({
@@ -29,7 +33,7 @@ export class CreateEvent {
       tags: [['#cinematic', '#documentary', '#moody'], Validators.required]
     })
   });
-
+  
   // Tag Management State
   suggestedTags = ['#candid', '#traditional', '#editorial', '#film', '#drone', '#corporate', '#wedding'];
   customTagInput = signal<string>('');
@@ -100,6 +104,36 @@ export class CreateEvent {
   isInvalid(controlPath: string): boolean {
     const control = this.eventForm.get(controlPath);
     return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  isOtherCategorySelected(): boolean {
+    return this.eventForm.get('basics.category')?.value === this.otherCategoryValue;
+  }
+
+  get categoryDisplayValue(): string {
+    const selectedCategory = this.eventForm.get('basics.category')?.value;
+    if (selectedCategory !== this.otherCategoryValue) {
+      return selectedCategory || 'Not specified';
+    }
+
+    const customCategory = this.eventForm.get('basics.customCategory')?.value?.trim();
+    return customCategory || 'Other';
+  }
+
+  onCategoryChange() {
+    const customCategoryControl = this.eventForm.get('basics.customCategory');
+    if (!customCategoryControl) {
+      return;
+    }
+
+    if (this.isOtherCategorySelected()) {
+      customCategoryControl.setValidators([Validators.required]);
+    } else {
+      customCategoryControl.clearValidators();
+      customCategoryControl.setValue('');
+    }
+
+    customCategoryControl.updateValueAndValidity();
   }
 
   submitEvent() {
