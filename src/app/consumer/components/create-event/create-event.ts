@@ -31,8 +31,8 @@ export class CreateEvent implements OnInit {
   // MODERN ANGULAR 22: Signal-based ViewChild
   mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
 
-  private map!: L.Map;
-  private marker!: L.Marker;
+  private map: L.Map | null = null;
+  private marker: L.Marker | null = null;
 
   // Navigation & Location State
   markerPosition = signal<{ lat: number; lng: number } | null>(null);
@@ -70,13 +70,32 @@ export class CreateEvent implements OnInit {
     effect(() => {
       const container = this.mapContainer();
 
-      // If the container exists (User reached Step 2) and map isn't initialized yet
-      if (container && !this.map) {
-        // Leaflet needs a tiny delay to ensure the DOM element has its final dimensions calculated
-        setTimeout(() => {
-          this.initMap(container.nativeElement);
-        }, 50);
+      // Step 2 is conditionally rendered, so the container is created/destroyed on step changes.
+      // Recreate and dispose the map along with that lifecycle to avoid stale DOM references.
+      if (!container) {
+        if (this.map) {
+          this.map.remove();
+          this.map = null;
+          this.marker = null;
+        }
+        return;
       }
+
+      const containerEl = container.nativeElement;
+
+      // Leaflet needs a tiny delay to ensure the container has final dimensions.
+      setTimeout(() => {
+        const latestContainer = this.mapContainer()?.nativeElement;
+        if (latestContainer !== containerEl) {
+          return;
+        }
+
+        if (!this.map) {
+          this.initMap(containerEl);
+        } else {
+          this.map.invalidateSize();
+        }
+      }, 50);
     });
   }
 
@@ -131,9 +150,29 @@ export class CreateEvent implements OnInit {
     this.map.on('geosearch/showlocation', (e: any) => {
       this.updateLocation(e.location.y, e.location.x, e.location.label, icon);
     });
+
+    // Restore previously selected location when returning to Step 2.
+    this.restoreSavedLocation(icon);
+  }
+
+  private restoreSavedLocation(icon: L.Icon) {
+    const lat = this.eventForm.get('location.latitude')?.value as number | null;
+    const lng = this.eventForm.get('location.longitude')?.value as number | null;
+    const venue = (this.eventForm.get('location.venue')?.value as string | null) ?? 'Selected location';
+
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    this.updateLocation(lat, lng, venue, icon);
+    this.map?.setView([lat, lng], 13);
   }
 
   private updateLocation(lat: number, lng: number, venueName: string, icon: L.Icon) {
+    if (!this.map) {
+      return;
+    }
+
     // Update marker on map
     if (this.marker) {
       this.marker.setLatLng([lat, lng]);
