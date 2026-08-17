@@ -21,7 +21,7 @@ export class Dashboard implements OnInit {
   consumerService = inject(ConsumerService);
   authService = inject(AuthService);
   private readonly router = inject(Router);
-  pageSize = signal(10);
+  pageSize = signal(3);
   pageCount = signal(1);
   consumerId : string = '';//fetch from cookie
 
