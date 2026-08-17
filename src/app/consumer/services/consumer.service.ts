@@ -28,4 +28,9 @@ export class ConsumerService {
         return this.baseService.get(baseUrl);
     }
 
+    createEvent(id: string, payload: object) : Observable<string> {
+        const baseUrl = `${this.baseUrl}/${id}/create/event`;
+        return this.baseService.post(baseUrl, payload);
+    }
+
 }

@@ -4,12 +4,18 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import * as L from 'leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { Router } from '@angular/router';
-import { EventType } from '../../models/event-types';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { finalize } from 'rxjs';
+import { EventType } from '../../../shared/models/event-types';
 import { LookupService } from '../../../shared/services/lookup.service';
+import { Tag } from '../../../shared/models/tags';
+import { AuthService } from '../../../auth/services/auth.service';
+import { ConsumerService } from '../../services/consumer.service';
+import { LoaderComponent } from '../../../shared/components/loader/loader';
 
 @Component({
   selector: 'app-create-event',
-  imports: [ReactiveFormsModule, NgClass],
+  imports: [ReactiveFormsModule, NgClass, LoaderComponent],
   templateUrl: './create-event.html',
   styleUrl: './create-event.css',
 })
@@ -17,49 +23,53 @@ export class CreateEvent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private lookupService = inject(LookupService);
+  private authService = inject(AuthService);
+  private consumerService = inject(ConsumerService);
+  private snackBar = inject(MatSnackBar);
   private readonly otherCategoryValue = 'Other';
 
   // MODERN ANGULAR 22: Signal-based ViewChild
   mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
-  
+
   private map!: L.Map;
   private marker!: L.Marker;
 
   // Navigation & Location State
   markerPosition = signal<{ lat: number; lng: number } | null>(null);
   currentStep = signal<number>(1);
+  isLoading = signal<boolean>(false);
+  private pendingRequests = 0;
   eventTypes = signal<EventType[]>([]);
+  tags = signal<Tag[]>([]);
 
   // Reactive Form Setup with Nested Groups per step
   eventForm: FormGroup = this.fb.group({
     basics: this.fb.group({
       title: ['', Validators.required],
-      category: ['', Validators.required],
-      customCategory: [''],
+      categoryId: [null as string | null, Validators.required],
+      customCategory: [null as string | null],
       date: ['', Validators.required],
       duration: [null as number | null, [Validators.required, Validators.min(0.25)]],
-      budget: [null, [Validators.required, Validators.min(1000)]]
+      budget: [null, [Validators.required, Validators.min(1000)]],
     }),
     location: this.fb.group({
       venue: ['', Validators.required],
       latitude: [null as number | null, Validators.required],
-      longitude: [null as number | null, Validators.required]
+      longitude: [null as number | null, Validators.required],
     }),
     style: this.fb.group({
-      tags: [['#cinematic', '#documentary', '#moody'], Validators.required],
-      specialRequirements: ['', [Validators.maxLength(500)]]
-    })
+      tags: [[], [Validators.required, Validators.minLength(1)]],
+      specialRequirements: ['', [Validators.maxLength(500)]],
+    }),
   });
 
   // Tag Management State
-  suggestedTags = ['#candid', '#traditional', '#editorial', '#film', '#drone', '#corporate', '#wedding'];
-  customTagInput = signal<string>('');
 
   constructor() {
     // MODERN ANGULAR 22: effect() reacts automatically when the element enters the DOM
     effect(() => {
       const container = this.mapContainer();
-      
+
       // If the container exists (User reached Step 2) and map isn't initialized yet
       if (container && !this.map) {
         // Leaflet needs a tiny delay to ensure the DOM element has its final dimensions calculated
@@ -69,19 +79,25 @@ export class CreateEvent implements OnInit {
       }
     });
   }
+
   ngOnInit(): void {
     this.getCategories();
+    this.getTags();
     console.log('Categories fetched:', this.eventTypes());
+  }
+
+  isOtherCategorySelected(): boolean {
+    return this.eventForm.get('basics.categoryId')?.value === this.otherCategoryValue;
   }
 
   private initMap(containerEl: HTMLDivElement) {
     // 1. Initialize the map centered on a default location (e.g., Ernakulam)
-    this.map = L.map(containerEl).setView([9.9816, 76.2999], 13); 
+    this.map = L.map(containerEl).setView([9.9816, 76.2999], 13);
 
     // 2. Add free OpenStreetMap tiles
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
 
     // 3. Fix default marker icon paths (Common Leaflet + Angular bundler issue)
@@ -89,7 +105,7 @@ export class CreateEvent implements OnInit {
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
       shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       iconSize: [25, 41],
-      iconAnchor: [12, 41]
+      iconAnchor: [12, 41],
     });
 
     // 4. Add the GeoSearch (Autocomplete) Control
@@ -102,7 +118,7 @@ export class CreateEvent implements OnInit {
       animateZoom: true,
       autoClose: true,
       searchLabel: 'Search for a venue or city...',
-      keepResult: true
+      keepResult: true,
     });
     this.map.addControl(searchControl);
 
@@ -130,17 +146,17 @@ export class CreateEvent implements OnInit {
     this.eventForm.get('location')?.patchValue({
       venue: venueName,
       latitude: lat,
-      longitude: lng
+      longitude: lng,
     });
   }
 
   get durationTimeStr(): string {
     const val = this.eventForm.get('basics.duration')?.value;
-    if (!val) return '';
-    
+    if (!val) return '00:00';
+
     const hours = Math.floor(val);
     const minutes = Math.round((val - hours) * 60);
-    
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
@@ -154,7 +170,7 @@ export class CreateEvent implements OnInit {
 
       // Force 15-minute increments just in case the browser bypasses the step attribute
       let roundedMinutes = Math.round(minutes / 15) * 15;
-      
+
       // Handle edge case where rounding pushes minutes to 60
       if (roundedMinutes === 60) {
         hours += 1;
@@ -162,9 +178,9 @@ export class CreateEvent implements OnInit {
       }
 
       // Convert to decimal (e.g., 4 hrs 15 mins = 4.25)
-      const decimalDuration = hours + (roundedMinutes / 60);
+      const decimalDuration = hours + roundedMinutes / 60;
       this.eventForm.get('basics.duration')?.setValue(decimalDuration);
-      
+
       // Update the input field visually to reflect any rounding
       input.value = `${hours.toString().padStart(2, '0')}:${roundedMinutes.toString().padStart(2, '0')}`;
     } else {
@@ -175,14 +191,14 @@ export class CreateEvent implements OnInit {
   get formattedDuration(): string {
     const val = this.eventForm.get('basics.duration')?.value;
     if (!val) return 'Not specified';
-    
+
     const hours = Math.floor(val);
     const minutes = Math.round((val - hours) * 60);
-    
+
     if (minutes === 0) {
       return `${hours}h`;
     }
-    
+
     return `${hours}h ${minutes}mins`;
   }
 
@@ -194,10 +210,14 @@ export class CreateEvent implements OnInit {
   // Form Validation Helper
   canGoNext(): boolean {
     switch (this.currentStep()) {
-      case 1: return this.eventForm.get('basics')?.valid ?? false;
-      case 2: return this.eventForm.get('location')?.valid ?? false;
-      case 3: return (this.eventForm.get('style.tags')?.value?.length ?? 0) > 0;
-      default: return true;
+      case 1:
+        return this.eventForm.get('basics')?.valid ?? false;
+      case 2:
+        return this.eventForm.get('location')?.valid ?? false;
+      case 3:
+        return (this.eventForm.get('style.tags')?.value?.length ?? 0) > 0;
+      default:
+        return true;
     }
   }
 
@@ -205,16 +225,16 @@ export class CreateEvent implements OnInit {
   nextStep() {
     // Force touch all controls in the current step to show errors if they bypassed the disabled button somehow
     this.markCurrentStepTouched();
-    
+
     if (this.canGoNext() && this.currentStep() < 4) {
-      this.currentStep.update(s => s + 1);
+      this.currentStep.update((s) => s + 1);
       window.scrollTo(0, 0);
     }
   }
 
   prevStep() {
     if (this.currentStep() > 1) {
-      this.currentStep.update(s => s - 1);
+      this.currentStep.update((s) => s - 1);
       window.scrollTo(0, 0);
     }
   }
@@ -233,23 +253,27 @@ export class CreateEvent implements OnInit {
     return this.eventForm.get('style.tags')?.value || [];
   }
 
-  removeTag(tagToRemove: string) {
-    const updatedTags = this.currentTags.filter(t => t !== tagToRemove);
+  get selectedTags(): Tag[] {
+    const selectedTagIds = this.currentTags;
+    return this.tags().filter((tag) => selectedTagIds.includes(tag.id));
+  }
+
+  isTagSelected(tagId: string): boolean {
+    return this.currentTags.includes(tagId);
+  }
+
+  getTagNameById(tagId: string): string {
+    return this.tags().find((tag) => tag.id === tagId)?.name ?? tagId;
+  }
+
+  removeTag(tagIdToRemove: string) {
+    const updatedTags = this.currentTags.filter((tagId) => tagId !== tagIdToRemove);
     this.eventForm.get('style.tags')?.setValue(updatedTags);
   }
 
-  addCustomTag() {
-    const val = this.customTagInput().trim();
-    if (val) {
-      const formattedTag = val.startsWith('#') ? val : `#${val}`;
-      this.addTag(formattedTag);
-      this.customTagInput.set(''); 
-    }
-  }
-
-  addTag(tag: string) {
-    if (!this.currentTags.includes(tag)) {
-      this.eventForm.get('style.tags')?.setValue([...this.currentTags, tag]);
+  addTag(tagId: string) {
+    if (!this.currentTags.includes(tagId)) {
+      this.eventForm.get('style.tags')?.setValue([...this.currentTags, tagId]);
     }
   }
 
@@ -259,14 +283,13 @@ export class CreateEvent implements OnInit {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  isOtherCategorySelected(): boolean {
-    return this.eventForm.get('basics.category')?.value === this.otherCategoryValue;
-  }
-
   get categoryDisplayValue(): string {
-    const selectedCategory = this.eventForm.get('basics.category')?.value;
-    if (selectedCategory !== this.otherCategoryValue) {
-      return selectedCategory || 'Not specified';
+    const selectedCategoryId = this.eventForm.get('basics.categoryId')?.value;
+
+    if (selectedCategoryId !== this.otherCategoryValue) {
+      // Find the matching name from the API results for the review step
+      const category = this.eventTypes().find((c) => c.id === selectedCategoryId);
+      return category ? category.name : 'Not specified';
     }
 
     const customCategory = this.eventForm.get('basics.customCategory')?.value?.trim();
@@ -275,34 +298,123 @@ export class CreateEvent implements OnInit {
 
   onCategoryChange() {
     const customCategoryControl = this.eventForm.get('basics.customCategory');
-    if (!customCategoryControl) {
-      return;
-    }
+    if (!customCategoryControl) return;
 
     if (this.isOtherCategorySelected()) {
       customCategoryControl.setValidators([Validators.required]);
     } else {
       customCategoryControl.clearValidators();
-      customCategoryControl.setValue('');
+      // Nullify the custom category if a standard API category is chosen
+      customCategoryControl.setValue(null);
     }
-
     customCategoryControl.updateValueAndValidity();
   }
 
   submitEvent() {
     if (this.eventForm.valid) {
-      console.log('Event Created Successfully!', this.eventForm.value);
-      // Call your API service here
+      const formValue = this.eventForm.value;
+
+      // Prepare the exact payload you described
+      let finalCategoryId = formValue.basics.categoryId;
+      let finalCustomCategory = formValue.basics.customCategory;
+
+      // If 'Other' is selected, set categoryId to null
+      if (finalCategoryId === this.otherCategoryValue) {
+        finalCategoryId = null;
+      } else {
+        // Just an extra safety net, onCategoryChange already handles this
+        finalCustomCategory = null;
+      }
+
+      const consumerId = this.authService.getRoleScopedProfileId();
+      if (!consumerId){
+        this.snackBar.open('Could not create event. Consumer profile not found.', 'Close', {
+          duration: 3500,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+        });
+        console.error('Consumer ID not found');
+        return;
+      }
+
+      const commandPayload = {
+        title: formValue.basics.title,
+        eventCategoryId: finalCategoryId,
+        customEventCategory: finalCustomCategory,
+        eventDate: formValue.basics.date,
+        budget: formValue.basics.budget,
+        location: {
+          latitude: formValue.location.latitude,
+          longitude: formValue.location.longitude,
+        },
+        duration: formValue.basics.duration,
+        tagIds: formValue.style.tags,
+        consumerId: consumerId,
+        specialRequirements: formValue.style.specialRequirements || null,
+      };
+
+      console.log('Event Created Successfully! Payload:', commandPayload);
+      this.startLoading();
+      this.consumerService.createEvent(consumerId, commandPayload)
+      .pipe(finalize(() => this.stopLoading()))
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Event created successfully.', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
+          void this.router.navigate(['/consumer/dashboard']);
+        },
+        error: (error) => {
+          const apiMessage = error?.error?.message;
+          const message = typeof apiMessage === 'string' && apiMessage.trim().length > 0
+            ? apiMessage
+            : 'Failed to create event. Please try again.';
+          this.snackBar.open(message, 'Close', {
+            duration: 4500,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
+          console.error('Error creating event:', error);
+        },
+      });
+
     }
   }
 
   getCategories() {
-    this.lookupService.getEventTypes().subscribe({
+    this.startLoading();
+    this.lookupService.getEventTypes()
+    .pipe(finalize(() => this.stopLoading()))
+    .subscribe({
       next: (types) => {
         this.eventTypes.set(types);
         console.log('Fetched Event Types:', types);
-      }
-    })
+      },
+    });
+  }
+
+  getTags() {
+    this.startLoading();
+    this.lookupService.getTags()
+    .pipe(finalize(() => this.stopLoading()))
+    .subscribe({
+      next: (tags) => {
+        this.tags.set(tags);
+        console.log('Fetched Tags:', tags);
+      },
+    });
+  }
+
+  private startLoading(): void {
+    this.pendingRequests += 1;
+    this.isLoading.set(true);
+  }
+
+  private stopLoading(): void {
+    this.pendingRequests = Math.max(0, this.pendingRequests - 1);
+    this.isLoading.set(this.pendingRequests > 0);
   }
 
   cancelClicked() {
