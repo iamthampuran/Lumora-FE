@@ -7,7 +7,7 @@ export interface EventDashboard{
 
 export interface EventDetails{
     title: string;
-    date: Date;
+    eventDate: Date;
     location: {latitude: number, longitude: number};
     duration: number;
     lastModifiedDate: Date;

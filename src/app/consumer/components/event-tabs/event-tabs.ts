@@ -18,7 +18,7 @@ export class EventTabs {
     return this.actualEvents().slice(0,3).map((event, index) => ({
       id: index,
       title: event.title,
-      dateLabel: this.formatDate(event.date),
+      dateLabel: this.formatDate(event.eventDate),
       locationLabel: this.formatLocation(event.location),
       durationLabel: this.formatDuration(event.duration),
       updatedLabel: this.formatLastUpdated(event.lastModifiedDate),
