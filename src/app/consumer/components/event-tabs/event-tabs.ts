@@ -15,10 +15,10 @@ export class EventTabs {
   readonly statusChanged = output<EventStatus>();
 
   readonly mappedEvents = computed(() => {
-    return this.actualEvents().map((event, index) => ({
+    return this.actualEvents().slice(0,3).map((event, index) => ({
       id: index,
       title: event.title,
-      dateLabel: this.formatDate(event.date),
+      dateLabel: this.formatDate(event.eventDate),
       locationLabel: this.formatLocation(event.location),
       durationLabel: this.formatDuration(event.duration),
       updatedLabel: this.formatLastUpdated(event.lastModifiedDate),
@@ -48,13 +48,8 @@ export class EventTabs {
     return "Events you've successfully completed.";
   }
 
-  getSortLabel(): string {
-    if (this.isCompletedTab()) return 'Latest completed';
-    return 'Latest updated';
-  }
-
   getStatusLabel(): string {
-    if (this.isCreatedTab()) return 'Draft';
+    if (this.isCreatedTab()) return 'Created';
     if (this.isActiveTab()) return 'Active';
     return 'Completed';
   }
