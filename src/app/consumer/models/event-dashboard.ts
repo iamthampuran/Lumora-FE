@@ -6,6 +6,7 @@ export interface EventDashboard{
 }
 
 export interface EventDetails{
+    id: string;
     title: string;
     eventDate: Date;
     location: {latitude: number, longitude: number};

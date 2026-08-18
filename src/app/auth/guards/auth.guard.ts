@@ -9,6 +9,12 @@ const ROLE_DASHBOARD: Record<UserRole, string> = {
   [UserRole.Admin]: '/admin',
 };
 
+const ROLE_SECTION: Record<UserRole, string> = {
+  [UserRole.Cosnsumer]: '/consumer',
+  [UserRole.Studio]: '/studio',
+  [UserRole.Admin]: '/admin',
+};
+
 export const authGuard: CanActivateFn = (_route, state: RouterStateSnapshot) => {
   const authService = inject(AuthService);
   const router = inject(Router);
@@ -24,9 +30,10 @@ export const authGuard: CanActivateFn = (_route, state: RouterStateSnapshot) => 
   }
 
   const dashboardPath = ROLE_DASHBOARD[role];
+  const sectionPath = ROLE_SECTION[role];
 
-  // Already heading to the correct dashboard — allow through
-  if (state.url.startsWith(dashboardPath)) {
+  // Allow any route within the user's role section.
+  if (state.url.startsWith(sectionPath)) {
     return true;
   }
 

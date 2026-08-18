@@ -30,6 +30,7 @@ export class CreateEvent implements OnInit {
 
   // MODERN ANGULAR 22: Signal-based ViewChild
   mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
+  categorySearchInput = viewChild<ElementRef<HTMLInputElement>>('categorySearchInput');
 
   private map: L.Map | null = null;
   private marker: L.Marker | null = null;
@@ -38,6 +39,8 @@ export class CreateEvent implements OnInit {
   markerPosition = signal<{ lat: number; lng: number } | null>(null);
   currentStep = signal<number>(1);
   isLoading = signal<boolean>(false);
+  isCategoryDropdownOpen = signal<boolean>(false);
+  categorySearch = signal<string>('');
   private pendingRequests = 0;
   eventTypes = signal<EventType[]>([]);
   tags = signal<Tag[]>([]);
@@ -333,6 +336,64 @@ export class CreateEvent implements OnInit {
 
     const customCategory = this.eventForm.get('basics.customCategory')?.value?.trim();
     return customCategory || 'Other';
+  }
+
+  get categorySelectLabel(): string {
+    const selectedCategoryId = this.eventForm.get('basics.categoryId')?.value;
+    if (!selectedCategoryId) return 'Select a category';
+
+    if (selectedCategoryId === this.otherCategoryValue) {
+      return 'Other';
+    }
+
+    return this.eventTypes().find((c) => c.id === selectedCategoryId)?.name ?? 'Select a category';
+  }
+
+  toggleCategoryDropdown(): void {
+    const shouldOpen = !this.isCategoryDropdownOpen();
+
+    if (shouldOpen) {
+      this.categorySearch.set('');
+      this.isCategoryDropdownOpen.set(true);
+
+      // Wait until dropdown is rendered, then focus search input for immediate typing.
+      setTimeout(() => {
+        const input = this.categorySearchInput()?.nativeElement;
+        input?.focus();
+      }, 0);
+      return;
+    }
+
+    this.isCategoryDropdownOpen.set(false);
+  }
+
+  selectCategory(categoryId: string): void {
+    this.eventForm.get('basics.categoryId')?.setValue(categoryId);
+    this.eventForm.get('basics.categoryId')?.markAsTouched();
+    this.onCategoryChange();
+    this.isCategoryDropdownOpen.set(false);
+    this.categorySearch.set('');
+  }
+
+  onCategorySearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.categorySearch.set(input.value ?? '');
+  }
+
+  get filteredEventTypes(): EventType[] {
+    const query = this.categorySearch().trim().toLowerCase();
+    if (!query) return this.eventTypes();
+
+    return this.eventTypes().filter((type) => type.name.toLowerCase().includes(query));
+  }
+
+  closeCategoryDropdownOnBlur(event: FocusEvent): void {
+    const container = event.currentTarget as HTMLElement | null;
+    const nextFocused = event.relatedTarget as Node | null;
+
+    if (container && (!nextFocused || !container.contains(nextFocused))) {
+      this.isCategoryDropdownOpen.set(false);
+    }
   }
 
   onCategoryChange() {

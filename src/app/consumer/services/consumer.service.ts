@@ -6,6 +6,7 @@ import { EventDashboard } from '../models/event-dashboard';
 import { EventStatus } from '../enums/event.status.enum';
 import { HttpParams } from '@angular/common/http';
 import { InquiryWidget } from '../models/inquiry-widget';
+import { EventData } from '../models/event-data';
 
 @Injectable({
     providedIn: 'root'
@@ -31,6 +32,11 @@ export class ConsumerService {
     createEvent(id: string, payload: object) : Observable<string> {
         const baseUrl = `${this.baseUrl}/${id}/create/event`;
         return this.baseService.post(baseUrl, payload);
+    }
+
+    getEventDetails(eventId: string) : Observable<EventData>{
+        const baseUrl = `${this.baseUrl}/event/${eventId}`;
+        return this.baseService.get(baseUrl);
     }
 
 }

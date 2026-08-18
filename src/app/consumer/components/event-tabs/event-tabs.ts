@@ -1,6 +1,7 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { EventStatus } from '../../enums/event.status.enum';
 import { EventDetails } from '../../models/event-dashboard';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-event-tabs',
@@ -14,9 +15,11 @@ export class EventTabs {
   readonly actualEvents = input<EventDetails[]>([]);
   readonly statusChanged = output<EventStatus>();
 
+  private router = inject(Router);
+
   readonly mappedEvents = computed(() => {
-    return this.actualEvents().slice(0,3).map((event, index) => ({
-      id: index,
+    return this.actualEvents().slice(0, 3).map((event) => ({
+      id: event.id,
       title: event.title,
       dateLabel: this.formatDate(event.eventDate),
       locationLabel: this.formatLocation(event.location),
@@ -112,5 +115,10 @@ export class EventTabs {
     const weeks = Math.floor(days / 7);
     if (weeks === 1) return '1 week ago';
     return `${weeks} weeks ago`;
+  }
+
+  goToDetailsPage(eventId: string): void {
+    console.log("eventId", eventId);
+    this.router.navigate(['/consumer/events', eventId]);
   }
 }
