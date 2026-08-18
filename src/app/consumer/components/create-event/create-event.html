@@ -137,7 +137,18 @@
 
                 @if (isCategoryDropdownOpen()) {
                   <div class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-40 overflow-y-auto">
-                    @for (type of eventTypes(); track type.id) {
+                    <div class="sticky top-0 bg-white p-2 border-b border-gray-100">
+                      <input
+                        #categorySearchInput
+                        type="text"
+                        [value]="categorySearch()"
+                        (input)="onCategorySearchInput($event)"
+                        placeholder="Search category"
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none"
+                      />
+                    </div>
+
+                    @for (type of filteredEventTypes; track type.id) {
                       <button
                         type="button"
                         (click)="selectCategory(type.id)"
@@ -149,15 +160,21 @@
                       </button>
                     }
 
-                    <button
-                      type="button"
-                      (click)="selectCategory('Other')"
-                      class="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors border-t border-gray-100"
-                      [class.text-[#CF6B4E]]="eventForm.get('basics.categoryId')?.value === 'Other'"
-                      [class.font-medium]="eventForm.get('basics.categoryId')?.value === 'Other'"
-                    >
-                      Other
-                    </button>
+                    @if (filteredEventTypes.length === 0 && !'Other'.toLowerCase().includes(categorySearch().trim().toLowerCase())) {
+                      <p class="px-4 py-3 text-xs text-gray-500">No categories found.</p>
+                    }
+
+                    @if ('Other'.toLowerCase().includes(categorySearch().trim().toLowerCase()) || categorySearch().trim().length === 0) {
+                      <button
+                        type="button"
+                        (click)="selectCategory('Other')"
+                        class="w-full text-left px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors border-t border-gray-100"
+                        [class.text-[#CF6B4E]]="eventForm.get('basics.categoryId')?.value === 'Other'"
+                        [class.font-medium]="eventForm.get('basics.categoryId')?.value === 'Other'"
+                      >
+                        Other
+                      </button>
+                    }
                   </div>
                 }
               </div>
