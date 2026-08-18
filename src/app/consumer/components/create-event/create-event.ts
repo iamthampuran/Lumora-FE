@@ -38,6 +38,7 @@ export class CreateEvent implements OnInit {
   markerPosition = signal<{ lat: number; lng: number } | null>(null);
   currentStep = signal<number>(1);
   isLoading = signal<boolean>(false);
+  isCategoryDropdownOpen = signal<boolean>(false);
   private pendingRequests = 0;
   eventTypes = signal<EventType[]>([]);
   tags = signal<Tag[]>([]);
@@ -333,6 +334,37 @@ export class CreateEvent implements OnInit {
 
     const customCategory = this.eventForm.get('basics.customCategory')?.value?.trim();
     return customCategory || 'Other';
+  }
+
+  get categorySelectLabel(): string {
+    const selectedCategoryId = this.eventForm.get('basics.categoryId')?.value;
+    if (!selectedCategoryId) return 'Select a category';
+
+    if (selectedCategoryId === this.otherCategoryValue) {
+      return 'Other';
+    }
+
+    return this.eventTypes().find((c) => c.id === selectedCategoryId)?.name ?? 'Select a category';
+  }
+
+  toggleCategoryDropdown(): void {
+    this.isCategoryDropdownOpen.update((state) => !state);
+  }
+
+  selectCategory(categoryId: string): void {
+    this.eventForm.get('basics.categoryId')?.setValue(categoryId);
+    this.eventForm.get('basics.categoryId')?.markAsTouched();
+    this.onCategoryChange();
+    this.isCategoryDropdownOpen.set(false);
+  }
+
+  closeCategoryDropdownOnBlur(event: FocusEvent): void {
+    const container = event.currentTarget as HTMLElement | null;
+    const nextFocused = event.relatedTarget as Node | null;
+
+    if (container && (!nextFocused || !container.contains(nextFocused))) {
+      this.isCategoryDropdownOpen.set(false);
+    }
   }
 
   onCategoryChange() {
