@@ -19,7 +19,7 @@ export class EventTabs {
 
   readonly mappedEvents = computed(() => {
     return this.actualEvents().slice(0, 3).map((event) => ({
-      id: event.Id,
+      id: event.id,
       title: event.title,
       dateLabel: this.formatDate(event.eventDate),
       locationLabel: this.formatLocation(event.location),
@@ -118,6 +118,7 @@ export class EventTabs {
   }
 
   goToDetailsPage(eventId: string): void {
-    this.router.navigate(['/consumer/event-details', eventId]);
+    console.log("eventId", eventId);
+    this.router.navigate(['/consumer/events', eventId]);
   }
 }

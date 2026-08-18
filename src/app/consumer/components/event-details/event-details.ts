@@ -3,10 +3,11 @@ import { EventData } from '../../models/event-data';
 import { ConsumerService } from '../../services/consumer.service';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
+import { ConsumerSidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-event-details',
-  imports: [],
+  imports: [ConsumerSidebar],
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })
@@ -17,8 +18,8 @@ export class EventDetails implements OnInit {
   consumerService = inject(ConsumerService);
   route = inject(ActivatedRoute);
 
-  readonly eventInfo = computed(() => this.eventData()?.EventInformationDetails ?? null);
-  readonly inquiryDetails = computed(() => this.eventData()?.InquiryDetails ?? []);
+  readonly eventInfo = computed(() => this.eventData()?.eventInformationDetails ?? null);
+  readonly inquiryDetails = computed(() => this.eventData()?.inquiryDetails ?? []);
   readonly activeInquiriesCount = computed(() => this.inquiryDetails().length);
 
   ngOnInit(): void {
@@ -42,7 +43,7 @@ export class EventDetails implements OnInit {
       next: (data) => {
         this.eventData.set(data);
 
-        if (!data?.EventInformationDetails) {
+        if (!data?.eventInformationDetails) {
           this.errorMessage.set('Event details are unavailable for this event.');
         }
       },

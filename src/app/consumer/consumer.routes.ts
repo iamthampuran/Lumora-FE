@@ -13,7 +13,7 @@ export const ConsumerRoutes: Routes = [
         component: CreateEvent
     },
     {
-        "path": "event-details/:id",
+        "path": "events/:id",
         component: EventDetails
     }
 ]

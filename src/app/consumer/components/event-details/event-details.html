@@ -1,5 +1,10 @@
-<div class="min-h-screen bg-[#FDFBF9] font-sans text-gray-900 p-6 md:p-12 lg:p-16">
-  <div class="max-w-6xl mx-auto">
+<div class="flex h-screen bg-[#FDFBF9] font-sans overflow-hidden">
+  <app-consumer-sidebar></app-consumer-sidebar>
+
+  <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+
+    <div class="p-8 pb-12 max-w-7xl mx-auto w-full text-gray-900">
+      <div class="max-w-6xl mx-auto">
     @if (isLoading()) {
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center text-sm text-gray-500">
         Loading event details...
@@ -78,10 +83,10 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-serif text-gray-900">Style & Preferences</h2>
-            <button class="text-[#CF6B4E] text-sm font-medium hover:underline flex items-center gap-1.5">
+            <!-- <button class="text-[#CF6B4E] text-sm font-medium hover:underline flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
               Edit
-            </button>
+            </button> -->
           </div>
           
           <div class="flex flex-wrap gap-3 mb-6">
@@ -177,5 +182,7 @@
         Event details are unavailable.
       </div>
     }
-  </div>
+      </div>
+    </div>
+  </main>
 </div>

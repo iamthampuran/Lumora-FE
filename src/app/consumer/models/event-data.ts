@@ -1,6 +1,6 @@
 export interface EventData{
-    InquiryDetails: InquiryDetail[];
-    EventInformationDetails: EventInformationDetails;
+    inquiryDetails: InquiryDetail[];
+    eventInformationDetails: EventInformationDetails;
 }
 
 export interface InquiryDetail{
