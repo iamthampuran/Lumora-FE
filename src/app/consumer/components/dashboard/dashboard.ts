@@ -1,6 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ConsumerService } from '../../services/consumer.service';
-import { ConsumerSidebar } from '../sidebar/sidebar';
 import { ConsumerRecentActivity } from '../recent-activity/recent-activity';
 import { EventTabs } from "../event-tabs/event-tabs";
 import { EventStatus } from '../../enums/event.status.enum';
@@ -11,7 +10,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ConsumerSidebar, ConsumerRecentActivity, EventTabs, DashboardStatsRowComponent],
+  imports: [ConsumerRecentActivity, EventTabs, DashboardStatsRowComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
