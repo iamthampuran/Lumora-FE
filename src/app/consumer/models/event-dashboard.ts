@@ -9,7 +9,9 @@ export interface EventDetails{
     id: string;
     title: string;
     eventDate: Date;
-    location: {latitude: number, longitude: number};
+    locationName: string;
     duration: number;
     lastModifiedDate: Date;
+    eventType: string;
+    isPredefined: boolean;  
 }
