@@ -1,8 +1,10 @@
+import { PaginatedResponse } from "../../shared/models/paginated-response";
+
 export interface EventDashboard{
     createdCount: number;
     activeCount: number;
     completedCount: number;
-    eventDetails: EventDetails[];
+    eventDetails: PaginatedResponse<EventDetails>;
 }
 
 export interface EventDetails{

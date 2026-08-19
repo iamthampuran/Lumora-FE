@@ -15,7 +15,7 @@ export const ConsumerRoutes: Routes = [
         component: Dashboard,
       },
       {
-        path: 'create-event',
+        path: 'events/create',
         component: CreateEvent,
       },
       {

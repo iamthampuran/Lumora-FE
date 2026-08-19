@@ -35,11 +35,11 @@ export class Dashboard implements OnInit {
 
   readonly eventsFetched = computed( () => {
     const data = this.dataFetched();
-    return data?.eventDetails ?? [];
+    return data?.eventDetails?.data ?? [];
   })
 
   createEvent(): void {
-    this.router.navigate(['/consumer/create-event']);
+    this.router.navigate(['/consumer/events/create']);
   }
 
   ngOnInit(): void {

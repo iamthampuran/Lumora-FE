@@ -15,12 +15,16 @@ export class ConsumerService {
     private readonly baseUrl = `${environment.apiUrl}/consumerprofile`;   
     protected baseService = inject(BaseService);
 
-    getConsumerEventDetails(consumerId: string, eventStatus: EventStatus, pageCount: number, pageSize: number) : Observable<EventDashboard> {
+    getConsumerEventDetails(consumerId: string, eventStatus: EventStatus, pageCount: number, pageSize: number, searchText : string| null = null) : Observable<EventDashboard> {
         const baseUrl = `${this.baseUrl}/${consumerId}/dashboard/events`;
         var queryParams = new HttpParams()
             .set('eventStatus', eventStatus.toString())
             .set('pageCount', pageCount.toString())
             .set('pageSize', pageSize.toString());
+            
+        if (searchText) {
+            queryParams = queryParams.set('searchText', searchText);
+        }
         return this.baseService.get(baseUrl, queryParams);
     }
     
