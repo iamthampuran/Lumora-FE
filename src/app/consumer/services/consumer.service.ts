@@ -7,6 +7,7 @@ import { EventStatus } from '../enums/event.status.enum';
 import { HttpParams } from '@angular/common/http';
 import { InquiryWidget } from '../models/inquiry-widget';
 import { EventData } from '../models/event-data';
+import { EventFilterPayload } from '../../shared/models/event-filter';
 
 @Injectable({
     providedIn: 'root'
@@ -15,7 +16,8 @@ export class ConsumerService {
     private readonly baseUrl = `${environment.apiUrl}/consumerprofile`;   
     protected baseService = inject(BaseService);
 
-    getConsumerEventDetails(consumerId: string, eventStatus: EventStatus, pageCount: number, pageSize: number, searchText : string| null = null) : Observable<EventDashboard> {
+    getConsumerEventDetails(consumerId: string, eventStatus: EventStatus, pageCount: number, pageSize: number, searchText : string| null = null,  filters: EventFilterPayload | null = null) : 
+    Observable<EventDashboard> {
         const baseUrl = `${this.baseUrl}/${consumerId}/dashboard/events`;
         var queryParams = new HttpParams()
             .set('eventStatus', eventStatus.toString())
@@ -24,6 +26,29 @@ export class ConsumerService {
             
         if (searchText) {
             queryParams = queryParams.set('searchText', searchText);
+        }
+        if (filters) {
+            if (filters.eventTypes && filters.eventTypes.length > 0) {
+                filters.eventTypes.forEach(id => {
+                    queryParams = queryParams.append('EventTypeIds', id);
+                });
+            }
+
+            const fromDate = filters.fromDate ? new Date(filters.fromDate) : null;
+            const toDate = filters.toDate ? new Date(filters.toDate) : null;
+
+            if (fromDate && !Number.isNaN(fromDate.getTime())) {
+                queryParams = queryParams.set('StartDate', fromDate.toDateString());
+            }
+            if (toDate && !Number.isNaN(toDate.getTime())) {
+                queryParams = queryParams.set('EndDate', toDate.toDateString());
+            }
+            if (filters.minBudget !== null && filters.minBudget !== undefined) {
+                queryParams = queryParams.set('MinPrice', filters.minBudget.toString());
+            }
+            if (filters.maxBudget !== null && filters.maxBudget !== undefined) {
+                queryParams = queryParams.set('MaxPrice', filters.maxBudget.toString());
+            }
         }
         return this.baseService.get(baseUrl, queryParams);
     }

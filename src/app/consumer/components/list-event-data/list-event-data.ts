@@ -6,6 +6,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { ConsumerService } from '../../services/consumer.service';
 import { EventDetails } from '../../models/event-dashboard';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
+import { EventFilterPayload } from '../../../shared/models/event-filter';
 
 @Component({
   selector: 'app-list-event-data',
@@ -16,6 +17,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader';
 export class ListEventData {
   tabStatus = input.required<EventStatus>();
   searchQuery = input<string | null>();
+  activeFilters = input<EventFilterPayload | null>();
 
   consumerId = signal<string | null>(null);
   isLoading = signal<boolean>(false);
@@ -40,11 +42,12 @@ export class ListEventData {
     effect(() => {
       const status = this.tabStatus();
       const query = this.searchQuery();
-      
+      const filters = this.activeFilters();
+
       // Untracked prevents currentPage changes from re-triggering this effect
       untracked(() => {
         this.currentPage.set(1);
-        this.getEvents(status, query);
+        this.getEvents(status, query, filters);
       });
     });
   }
@@ -74,7 +77,7 @@ export class ListEventData {
   setPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.getEvents(this.tabStatus(), this.searchQuery());
+      this.getEvents(this.tabStatus(), this.searchQuery(), this.activeFilters() ?? null);
       window.scrollTo(0, 0); 
     }
   }
@@ -83,19 +86,21 @@ export class ListEventData {
     const target = event.target as HTMLSelectElement;
     this.pageSize.set(Number(target.value));
     this.currentPage.set(1); 
-    this.getEvents(this.tabStatus(), this.searchQuery());
+    this.getEvents(this.tabStatus(), this.searchQuery(), this.activeFilters() ?? null);
   }
 
-  getEvents(status: EventStatus, query: string | null = null) {
+  getEvents(status: EventStatus, query: string | null = null, filters: EventFilterPayload | null = null) {
     if (!this.consumerId()) return;
     
     this.isLoading.set(true);
+    console.log('Fetching events with filters:', filters); // Debugging line
     this.consumerService.getConsumerEventDetails(
       this.consumerId()!,
       status,
       this.currentPage(),
       this.pageSize(),
-      query || ''
+      query || '',
+      filters
     ).pipe(finalize(() => this.isLoading.set(false)))
     .subscribe({
       next: (data) => {

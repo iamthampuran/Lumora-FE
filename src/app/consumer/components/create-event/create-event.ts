@@ -513,7 +513,7 @@ export class CreateEvent implements OnInit {
 
   getCategories() {
     this.startLoading();
-    this.lookupService.getEventTypes()
+    this.lookupService.getEventTypes(false)
     .pipe(finalize(() => this.stopLoading()))
     .subscribe({
       next: (types) => {

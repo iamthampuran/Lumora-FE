@@ -1,0 +1,221 @@
+<div
+  class="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40"
+  [ngClass]="isClosing() ? 'animate-fade-out' : 'animate-fade-in'"
+  (click)="closePanel.emit()"
+></div>
+
+<!-- Slide-out Panel -->
+<div
+  class="fixed inset-y-0 right-0 w-full max-w-md bg-[#FDFBF9] shadow-2xl z-50 flex flex-col"
+  [ngClass]="isClosing() ? 'animate-slide-out-right' : 'animate-slide-in-right'"
+>
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-6 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+      <svg
+        class="w-6 h-6 text-[#CF6B4E]"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+        ></path>
+      </svg>
+      <div>
+        <h2 class="text-2xl font-serif text-gray-900">Filter Events</h2>
+        <p class="text-xs text-gray-500 mt-1">
+          Refine your events by applying one or more filters.
+        </p>
+      </div>
+    </div>
+    <button
+      (click)="closePanel.emit()"
+      class="p-2 text-gray-400 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Scrollable Form Content -->
+  <form [formGroup]="filterForm" class="flex-1 overflow-y-auto p-6 space-y-8">
+    <!-- Event Type (Multi-Select) -->
+    <!-- Event Type (Checkboxes) -->
+    <div>
+      <label class="block text-sm font-bold text-gray-900 mb-3">Event Type</label>
+
+      <!-- Checkbox Grid -->
+      <div class="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-1 -m-1">
+        @for (type of eventTypes(); track type.id) {
+          <label
+            class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors"
+            [class.border-[#CF6B4E]]="isEventTypeSelected(type.id)"
+            [class.bg-orange-50]="isEventTypeSelected(type.id)"
+            [class.border-gray-200]="!isEventTypeSelected(type.id)"
+            [class.hover:bg-gray-50]="!isEventTypeSelected(type.id)"
+          >
+            <input
+              type="checkbox"
+              [value]="type.id"
+              [checked]="isEventTypeSelected(type.id)"
+              (change)="toggleEventType(type.id, $event)"
+              class="w-4 h-4 text-[#CF6B4E] border-gray-300 rounded focus:ring-[#CF6B4E] cursor-pointer"
+            />
+            <span
+              class="text-sm text-gray-700 font-medium select-none truncate"
+              [title]="type.name"
+            >
+              {{ type.name }}
+            </span>
+          </label>
+        }
+      </div>
+
+      @if (eventTypes().length === 0) {
+        <p class="text-xs text-gray-500 italic">Loading event types...</p>
+      }
+    </div>
+
+    <!-- Event Date -->
+    <div>
+      <label class="block text-sm font-bold text-gray-900 mb-3">Event Date</label>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="relative">
+          <label
+            class="absolute -top-2 left-3 bg-[#FDFBF9] px-1 text-[10px] font-medium text-gray-500"
+            >From</label
+          >
+          <input
+            type="date"
+            formControlName="startDate"
+            class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#CF6B4E]"
+          />
+        </div>
+        <div class="relative">
+          <label
+            class="absolute -top-2 left-3 bg-[#FDFBF9] px-1 text-[10px] font-medium text-gray-500"
+            >To</label
+          >
+          <input
+            type="date"
+            formControlName="endDate"
+            class="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#CF6B4E]"
+          />
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          (click)="setDatePreset('thisMonth')"
+          [class]="
+            activeDatePreset() === 'thisMonth'
+              ? 'bg-orange-50 text-[#CF6B4E] border-[#CF6B4E]'
+              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+          "
+          class="px-4 py-2 text-xs font-medium border rounded-lg transition-colors cursor-pointer"
+        >
+          This Month
+        </button>
+        <button
+          type="button"
+          (click)="setDatePreset('nextMonth')"
+          [class]="
+            activeDatePreset() === 'nextMonth'
+              ? 'bg-orange-50 text-[#CF6B4E] border-[#CF6B4E]'
+              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+          "
+          class="px-4 py-2 text-xs font-medium border rounded-lg transition-colors cursor-pointer"
+        >
+          Next Month
+        </button>
+        <button
+          type="button"
+          (click)="setDatePreset('custom')"
+          [class]="
+            activeDatePreset() === 'custom'
+              ? 'bg-orange-50 text-[#CF6B4E] border-[#CF6B4E]'
+              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+          "
+          class="px-4 py-2 text-xs font-medium border rounded-lg transition-colors cursor-pointer"
+        >
+          Custom
+        </button>
+      </div>
+    </div>
+
+    <hr class="border-gray-100" />
+
+    <!-- Budget -->
+    <div>
+      <label class="block text-sm font-bold text-gray-900 mb-3">Budget</label>
+      <div class="flex items-center gap-4">
+        <div class="relative flex-1">
+          <label
+            class="absolute -top-2 left-3 bg-[#FDFBF9] px-1 text-[10px] font-medium text-gray-500"
+            >Min Budget</label
+          >
+          <span class="absolute top-3 left-3 text-gray-500 text-sm">₹</span>
+          <input
+            type="number"
+            formControlName="minPrice"
+            placeholder="Min amount"
+            class="w-full pl-7 pr-3 py-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#CF6B4E]"
+          />
+        </div>
+        <span class="text-gray-400">-</span>
+        <div class="relative flex-1">
+          <label
+            class="absolute -top-2 left-3 bg-[#FDFBF9] px-1 text-[10px] font-medium text-gray-500"
+            >Max Budget</label
+          >
+          <span class="absolute top-3 left-3 text-gray-500 text-sm">₹</span>
+          <input
+            type="number"
+            formControlName="maxPrice"
+            placeholder="Max amount"
+            class="w-full pl-7 pr-3 py-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#CF6B4E]"
+          />
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Footer Actions -->
+  <footer class="p-6 border-t border-gray-100 flex items-center justify-between bg-white shrink-0">
+    <button
+      type="button"
+      (click)="onClearAll()"
+      class="px-6 py-3 flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        ></path>
+      </svg>
+      Clear All
+    </button>
+    <button
+      type="button"
+      (click)="onApply()"
+      class="px-8 py-3 flex items-center gap-2 text-sm font-medium text-white bg-[#C45A3E] hover:bg-[#b04a2e] rounded-xl transition-colors shadow-sm cursor-pointer"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+        ></path>
+      </svg>
+      Apply Filters
+    </button>
+  </footer>
+</div>
