@@ -3,11 +3,11 @@ import { EventData } from '../../models/event-data';
 import { ConsumerService } from '../../services/consumer.service';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
-import { ConsumerSidebar } from '../sidebar/sidebar';
+import { LoaderComponent } from '../../../shared/components/loader/loader';
 
 @Component({
   selector: 'app-event-details',
-  imports: [ConsumerSidebar],
+  imports: [LoaderComponent],
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })

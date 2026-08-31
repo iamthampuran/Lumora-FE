@@ -17,15 +17,23 @@ export class EventTabs {
 
   private router = inject(Router);
 
-  readonly mappedEvents = computed(() => {
-    return this.actualEvents().slice(0, 3).map((event) => ({
-      id: event.id,
-      title: event.title,
-      dateLabel: this.formatDate(event.eventDate),
-      locationLabel: this.formatLocation(event.location),
-      durationLabel: this.formatDuration(event.duration),
-      updatedLabel: this.formatLastUpdated(event.lastModifiedDate),
-    }));
+ readonly mappedEvents = computed(() => {
+    return this.actualEvents().slice(0, 3).map((event) => {
+      const fullLocation = event.locationName || '-';
+      const truncatedLocation = fullLocation.length > 20 
+        ? fullLocation.substring(0, 20) + '...' 
+        : fullLocation;
+
+      return {
+        id: event.id,
+        title: event.title,
+        dateLabel: this.formatDate(event.eventDate),
+        locationLabel: truncatedLocation,
+        fullLocationLabel: fullLocation,
+        durationLabel: this.formatDuration(event.duration),
+        updatedLabel: this.formatLastUpdated(event.lastModifiedDate),
+      };
+    });
   });
 
   setActiveTab(tab: EventStatus): void {
@@ -86,12 +94,6 @@ export class EventTabs {
       month: 'short',
       year: 'numeric',
     });
-  }
-
-  private formatLocation(location: EventDetails['location']): string {
-    if (!location) return '-';
-    if (typeof location === 'string') return location;
-    return `${location.latitude}, ${location.longitude}`;
   }
 
   private formatDuration(duration: number): string {

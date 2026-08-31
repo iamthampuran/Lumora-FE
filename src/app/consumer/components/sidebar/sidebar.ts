@@ -1,14 +1,15 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { AuthService } from '../../../auth/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { finalize } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-consumer-sidebar',
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
-  imports: [LoaderComponent]
+  imports: [LoaderComponent, RouterModule, CommonModule]
 })
 export class ConsumerSidebar implements OnInit {
   readonly isProfileMenuOpen = signal(false);
@@ -46,5 +47,9 @@ export class ConsumerSidebar implements OnInit {
         console.error('Error during logout:', error);
       }
     });
+  }
+
+  goToEventsPage() : void{
+    this.router.navigate(['/consumer/events']);
   }
 }

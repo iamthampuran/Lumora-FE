@@ -145,8 +145,9 @@ export class CreateEvent implements OnInit {
     this.map.addControl(searchControl);
 
     // 5. Handle user clicking the map to drop a pin
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.updateLocation(e.latlng.lat, e.latlng.lng, 'Selected on Map', icon);
+    this.map.on('click', async (e: L.LeafletMouseEvent) => {
+      const locationName = await this.getApproximateLocationName(e.latlng.lat, e.latlng.lng);
+      this.updateLocation(e.latlng.lat, e.latlng.lng, locationName, icon);
     });
 
     // 6. Handle user searching and selecting a location from the search bar
@@ -169,6 +170,32 @@ export class CreateEvent implements OnInit {
 
     this.updateLocation(lat, lng, venue, icon);
     this.map?.setView([lat, lng], 13);
+  }
+
+  private async getApproximateLocationName(lat: number, lng: number): Promise<string> {
+    try {
+      const url =
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Accept-Language': 'en',
+        },
+      });
+
+      if (!response.ok) {
+        return `Approx. ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      }
+
+      const data = (await response.json()) as { display_name?: string };
+      if (typeof data.display_name === 'string' && data.display_name.trim().length > 0) {
+        return data.display_name;
+      }
+    } catch {
+      // Fall back to a coordinate label when reverse geocoding fails.
+    }
+
+    return `Approx. ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   }
 
   private updateLocation(lat: number, lng: number, venueName: string, icon: L.Icon) {
@@ -446,6 +473,7 @@ export class CreateEvent implements OnInit {
         location: {
           latitude: formValue.location.latitude,
           longitude: formValue.location.longitude,
+          locationName: formValue.location.venue,
         },
         duration: formValue.basics.duration,
         tagIds: formValue.style.tags,
@@ -485,7 +513,7 @@ export class CreateEvent implements OnInit {
 
   getCategories() {
     this.startLoading();
-    this.lookupService.getEventTypes()
+    this.lookupService.getEventTypes(false)
     .pipe(finalize(() => this.stopLoading()))
     .subscribe({
       next: (types) => {

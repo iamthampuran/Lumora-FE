@@ -1,13 +1,10 @@
-<div class="flex h-screen bg-[#FDFBF9] font-sans overflow-hidden">
-  <app-consumer-sidebar></app-consumer-sidebar>
 
-  <main class="flex-1 flex flex-col h-screen overflow-y-auto">
 
     <div class="p-8 pb-12 max-w-7xl mx-auto w-full text-gray-900">
       <div class="max-w-6xl mx-auto">
     @if (isLoading()) {
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center text-sm text-gray-500">
-        Loading event details...
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 flex items-center justify-center">
+        <app-loader text="loading details"></app-loader>
       </div>
     } @else if (errorMessage()) {
       <div class="bg-white rounded-2xl border border-red-100 shadow-sm p-10 text-center">
@@ -184,5 +181,3 @@
     }
       </div>
     </div>
-  </main>
-</div>
