@@ -132,3 +132,21 @@
     </div>
   }
 </div>
+
+<!-- Upload Logo Modal -->
+@if (activeModal() === 'Logo') {
+  <app-upload-logo 
+    [isModal]="true" 
+    (close)="activeModal.set(null)" 
+    (uploaded)="onLogoUploaded()">
+  </app-upload-logo>
+}
+
+<!-- Upload Cover Modal -->
+@if (activeModal() === 'Cover') {
+  <app-upload-cover 
+    [isModal]="true" 
+    (close)="activeModal.set(null)" 
+    (uploaded)="onCoverUploaded()">
+  </app-upload-cover>
+}

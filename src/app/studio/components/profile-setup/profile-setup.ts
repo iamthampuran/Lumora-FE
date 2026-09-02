@@ -6,40 +6,52 @@ import { StudioService } from '../../servies/studio.service';
 import { ProfileCompletionResult, ProfileCompletionStep } from '../../models/profile-completion';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { finalize } from 'rxjs';
+import { UploadLogo } from '../upload-logo/upload-logo';
+import { UploadCover } from '../upload-cover/upload-cover';
 
 @Component({
   selector: 'app-profile-setup',
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover],
   templateUrl: './profile-setup.html',
   styleUrl: './profile-setup.css',
 })
 export class ProfileSetup implements OnInit {
-
   private authService = inject(AuthService);
   private studioService = inject(StudioService);
   private router = inject(Router);
 
   completionData = signal<ProfileCompletionResult | null>(null);
   isLoading = signal<boolean>(true);
+  activeModal = signal<string | null>(null);
 
   ngOnInit(): void {
-    const studioId = this.authService.getRoleScopedProfileId();
-
-    if (studioId){
-      this.studioService.getProfileCompletionStatus(studioId)
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-          next: (res) => this.completionData.set(res),
-          error: (err) => console.error('Error fetching completion status', err)
-        });
-    }
-    else{
-      this.isLoading.set(false);
-    }
+    this.loadProfileCompletionStatus();
   }
 
-  goToSettings(step: ProfileCompletionStep){
-    this.router.navigate([`/studio/settings`]);
+  private loadProfileCompletionStatus(): void {
+    const studioId = this.authService.getRoleScopedProfileId();
+    if (studioId) {
+      this.isLoading.set(true);
+      this.studioService
+        .getProfileCompletionStatus(studioId)
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: (res) => this.completionData.set(res),
+          error: (err) => console.error('Error fetching completion status', err),
+        });
+      return;
+    }
+    this.isLoading.set(false);
+  }
+
+  goToSettings(step: ProfileCompletionStep) {
+    if (step.title.includes('Logo')) {
+      this.activeModal.set('Logo');
+    } else if (step.title.includes('Cover')) {
+      this.activeModal.set('Cover');
+    } else {
+      this.router.navigate(['/studio/settings']);
+    }
   }
 
   logoutUser(): void {
@@ -50,7 +62,7 @@ export class ProfileSetup implements OnInit {
       },
       error: (error) => {
         console.error('Error during logout:', error);
-      }
+      },
     });
   }
 
@@ -65,4 +77,14 @@ export class ProfileSetup implements OnInit {
     return 'Complete Step';
   }
 
+  // NEW METHOD: Just close the modal and refresh!
+  onLogoUploaded() {
+    this.activeModal.set(null);
+    this.loadProfileCompletionStatus();
+  }
+
+  onCoverUploaded() {
+    this.activeModal.set(null);
+    this.loadProfileCompletionStatus();
+  }
 }

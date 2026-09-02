@@ -19,4 +19,8 @@ export class BaseService {
     delete(path: string, params: HttpParams = new HttpParams(), headers = new HttpHeaders()) : Observable<any> {
         return this.httpClient.delete(path, { params, headers, withCredentials: true });
     }
+    
+    patch(path: string, body: any, headers = new HttpHeaders()) : Observable<any> {
+        return this.httpClient.patch(path, body, { headers, withCredentials: true });
+    }
 }
