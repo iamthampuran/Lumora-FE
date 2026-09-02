@@ -3,6 +3,7 @@ import { BaseService } from '../../shared/base-service';
 import { Observable } from 'rxjs';
 import { StudioProfileModel } from '../models/studio-profile-model';
 import { environment } from '../../../environments/environment';
+import { ProfileCompletionResult } from '../models/profile-completion';
 
 @Service()
 export class StudioService {
@@ -11,6 +12,11 @@ export class StudioService {
 
     getStudioDetails(studioId: string) : Observable<StudioProfileModel> {
         const url = `${this.baseUrl}/${studioId}`;
+        return this.baseService.get(url);
+    }
+
+    getProfileCompletionStatus(studioId: string): Observable<ProfileCompletionResult> {
+        const url = `${this.baseUrl}/${studioId}/profile-completion`;
         return this.baseService.get(url);
     }
 
