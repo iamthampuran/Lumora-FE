@@ -150,3 +150,12 @@
     (uploaded)="onCoverUploaded()">
   </app-upload-cover>
 }
+
+<!-- Upload Portfolio Modal -->
+@if (activeModal() === 'Photos') {
+  <app-upload-portfolio 
+    [isModal]="true" 
+    (close)="activeModal.set(null)" 
+    (updated)="onPortfolioUpdated()">
+  </app-upload-portfolio>
+}

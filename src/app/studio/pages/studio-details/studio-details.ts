@@ -8,7 +8,7 @@ import {
   StudioProfileModel,
   TagDetails,
 } from '../../models/studio-profile-model';
-import { StudioService } from '../../servies/studio.service';
+import { StudioService } from '../../services/studio.service';
 import { ActivatedRoute } from '@angular/router';
 import { StatsBar } from '../../components/stats-bar/stats-bar';
 import { About } from '../../components/about/about';

@@ -100,7 +100,6 @@ export class AuthService {
         const role = this.getRole();
         if (role === UserRole.Cosnsumer) return '/consumer/dashboard';
         if (role === UserRole.Studio) {
-            // Simply route to /studio/dashboard. No ID needed!
             return this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup';
         }
         return '/login';
@@ -214,6 +213,39 @@ export class AuthService {
   isProfileComplete(): boolean {
     const payload = this.getTokenPayload();
     if (!payload) return false;
-    return payload['isProfileComplete'] === true || payload['isProfileComplete'] === 'true';
+
+    const claim = this.getBooleanClaim(payload, [
+      'isProfileComplete',
+      'isProfileCompleted',
+      'profileComplete',
+      'profileCompleted',
+      'IsProfileComplete',
+      'IsProfileCompleted',
+    ]);
+
+    return claim ?? false;
+  }
+
+  private getBooleanClaim(payload: Record<string, any>, claimKeys: string[]): boolean | null {
+    for (const key of claimKeys) {
+      const claimValue = payload[key];
+
+      if (typeof claimValue === 'boolean') {
+        return claimValue;
+      }
+
+      if (typeof claimValue === 'string') {
+        const normalized = claimValue.trim().toLowerCase();
+        if (normalized === 'true') return true;
+        if (normalized === 'false') return false;
+      }
+
+      if (typeof claimValue === 'number') {
+        if (claimValue === 1) return true;
+        if (claimValue === 0) return false;
+      }
+    }
+
+    return null;
   }
 }

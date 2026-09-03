@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { finalize } from 'rxjs';
-import { StudioService } from '../../servies/studio.service';
+import { StudioService } from '../../services/studio.service';
 import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({

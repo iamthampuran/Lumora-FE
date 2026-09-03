@@ -7,6 +7,6 @@ export const profileCompletionGuard : CanActivateFn = () => {
     const router = inject(Router);
 
     if(authService.isProfileComplete()) return true;
-    
-    return router.navigate(['/studio/setup']);
+
+    return router.parseUrl('/studio/setup');
 }

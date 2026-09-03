@@ -23,4 +23,9 @@ export class BaseService {
     patch(path: string, body: any, headers = new HttpHeaders()) : Observable<any> {
         return this.httpClient.patch(path, body, { headers, withCredentials: true });
     }
+
+    // Add this inside BaseService in app/shared/base-service.ts
+    put(path: string, body: any, headers = new HttpHeaders()) : Observable<any> {
+        return this.httpClient.put(path, body, { headers, withCredentials: true });
+    }
 }
