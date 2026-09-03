@@ -1,7 +1,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../environments/environment';
-import { BaseService } from '../../shared/base-service';
+import { BaseService } from '../../shared/services/base.service';
 import { UserRole } from '../enums/UserRole';
 import { CreateUser } from '../models/create.user';
 import { Observable } from 'rxjs';

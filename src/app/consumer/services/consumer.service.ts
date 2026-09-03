@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { BaseService } from '../../shared/base-service';
+import { BaseService } from '../../shared/services/base.service';
 import { Observable } from 'rxjs';
 import { EventDashboard } from '../models/event-dashboard';
 import { EventStatus } from '../enums/event.status.enum';

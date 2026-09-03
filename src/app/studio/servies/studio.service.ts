@@ -1,5 +1,5 @@
 import { inject, Service } from '@angular/core';
-import { BaseService } from '../../shared/base-service';
+import { BaseService } from '../../shared/services/base.service';
 import { Observable } from 'rxjs';
 import { StudioProfileModel } from '../models/studio-profile-model';
 import { environment } from '../../../environments/environment';
