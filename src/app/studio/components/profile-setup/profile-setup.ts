@@ -9,10 +9,11 @@ import { finalize } from 'rxjs';
 import { UploadLogo } from '../upload-logo/upload-logo';
 import { UploadCover } from '../upload-cover/upload-cover';
 import { UploadPortfolio } from '../upload-portfolio/upload-portfolio';
+import { ManageTags } from '../manage-tags/manage-tags';
 
 @Component({
   selector: 'app-profile-setup',
-  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover, UploadPortfolio],
+  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover, UploadPortfolio, ManageTags],
   templateUrl: './profile-setup.html',
   styleUrl: './profile-setup.css',
 })
@@ -45,16 +46,12 @@ export class ProfileSetup implements OnInit {
     this.isLoading.set(false);
   }
 
-  goToSettings(step: ProfileCompletionStep) {
-    if (step.title.includes('Logo')) {
-      this.activeModal.set('Logo');
-    } else if (step.title.includes('Cover')) {
-      this.activeModal.set('Cover');
-    }
-    else if (step.title.includes('Photos')) this.activeModal.set('Photos'); // <-- Add this
-     else {
-      this.router.navigate(['/studio/settings']);
-    }
+goToSettings(step: ProfileCompletionStep) {
+    if (step.title.includes('Logo')) this.activeModal.set('Logo');
+    else if (step.title.includes('Cover')) this.activeModal.set('Cover');
+    else if (step.title.includes('Photos')) this.activeModal.set('Photos');
+    else if (step.title.includes('Styles')) this.activeModal.set('Styles'); // ADD THIS
+    else this.router.navigate(['/studio/settings']); 
   }
 
   logoutUser(): void {
@@ -92,6 +89,11 @@ export class ProfileSetup implements OnInit {
   }
 
   onPortfolioUpdated() {
+    this.loadProfileCompletionStatus();
+  }
+
+  onTagsSaved() {
+    this.activeModal.set(null);
     this.loadProfileCompletionStatus();
   }
 }

@@ -159,3 +159,13 @@
     (updated)="onPortfolioUpdated()">
   </app-upload-portfolio>
 }
+
+<!-- Manage Tags Modal -->
+@if (activeModal() === 'Styles') {
+  <app-manage-tags 
+    [isModal]="true" 
+    [initialTags]="[]" 
+    (close)="activeModal.set(null)" 
+    (saved)="onTagsSaved()">
+  </app-manage-tags>
+}

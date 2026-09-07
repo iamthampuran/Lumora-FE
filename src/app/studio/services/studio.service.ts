@@ -1,7 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { BaseService } from '../../shared/services/base.service';
 import { Observable } from 'rxjs';
-import { StudioProfileModel } from '../models/studio-profile-model';
+import { StudioProfileModel, UpdateStudioTagsPayload } from '../models/studio-profile-model';
 import { environment } from '../../../environments/environment';
 import { ProfileCompletionResult } from '../models/profile-completion';
 
@@ -60,5 +60,10 @@ export class StudioService {
     formData.append('order', order.toString());
     formData.append('isDeleted', isDeleted.toString());
     return this.baseService.put(url, formData);
+  }
+
+  addStudioTags(studioId : string, payload: UpdateStudioTagsPayload): Observable<any> {
+    const url = `${this.baseUrl}/${studioId}/add-studio-tags`;
+    return this.baseService.post(url, payload);
   }
 }

@@ -1,0 +1,142 @@
+<div [ngClass]="isModal() ? 'fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6' : 'w-full'">
+  
+  @if (isModal()) {
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-fade-in" (click)="onCancel()"></div>
+  }
+
+  <div class="bg-white rounded-[20px] shadow-2xl w-full max-w-5xl h-[85vh] sm:h-[80vh] flex flex-col animate-slide-up relative z-10"
+       [ngClass]="!isModal() ? 'shadow-sm border border-gray-100 h-auto min-h-[600px]' : ''">
+    
+    <!-- Header -->
+    <div class="flex items-start justify-between p-6 sm:px-8 sm:py-6 border-b border-gray-100/50 shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-[#FFF5F0] text-[#CF6B4E] flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"></path></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-serif font-bold text-gray-900 leading-tight">Manage Portfolio Tags</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Organize your portfolio with tags.</p>
+        </div>
+      </div>
+      @if (isModal()) {
+        <button (click)="onCancel()" class="text-gray-400 hover:text-gray-900 transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      }
+    </div>
+
+    <!-- Scrollable Body (Split Grid) -->
+    <div class="flex-1 min-h-0 overflow-hidden grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+      
+      <!-- LEFT COLUMN: Search & Select -->
+      <div class="md:col-span-6 lg:col-span-7 flex flex-col h-full min-h-0 bg-white">
+        <div class="p-6 sm:p-8 flex-1 min-h-0 flex flex-col h-full overflow-hidden">
+          <div class="mb-4 shrink-0">
+            <h3 class="text-[15px] font-bold text-gray-900 mb-1">Choose Tags</h3>
+            <p class="text-[13px] text-gray-500 mb-4">Search from popular tags or create your custom tags.</p>
+            
+            <!-- Smart Search Input -->
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <svg class="w-4 h-4 text-gray-400 group-focus-within:text-[#CF6B4E] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <input type="text" [value]="searchQuery()" (input)="onSearchInput($event)" (keydown.enter)="$event.preventDefault(); createAndSelectTag()"
+                     placeholder="Search or type a new tag..." 
+                     class="w-full pl-10 pr-16 py-3 text-[13px] font-medium border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] transition-all bg-gray-50/30 focus:bg-white placeholder-gray-400">
+              
+              <!-- Inline Create Button -->
+              @if (showCreateOption()) {
+                <button (click)="createAndSelectTag()" class="absolute inset-y-1.5 right-1.5 px-3 bg-[#FFF5F0] text-[#CF6B4E] text-[11px] font-bold uppercase tracking-wider rounded-lg hover:bg-[#CF6B4E] hover:text-white transition-colors flex items-center gap-1 cursor-pointer">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+                  Add
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Tags Checkbox List -->
+          <div class="flex-1 min-h-0 overflow-y-auto pr-2 -mr-2">
+            @if (isLoading()) {
+              <div class="py-10 flex items-center justify-center gap-3 text-[13px] text-gray-500 font-medium">
+                <svg class="animate-spin h-4 w-4 text-[#CF6B4E]" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Loading tags...</span>
+              </div>
+            } @else {
+              <div class="grid grid-cols-2 gap-3 pb-4">
+                @for (tag of filteredTags(); track tag.id) {
+                  <label class="flex items-center gap-3 px-4 py-3 rounded-xl border transition-all cursor-pointer select-none"
+                         [ngClass]="isTagSelected(tag.id) ? 'border-[#CF6B4E] bg-[#FFF5F0]/50' : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'">
+                    <input type="checkbox" [checked]="isTagSelected(tag.id)" (change)="toggleTag(tag)" [disabled]="!isTagSelected(tag.id) && selectedTags().length >= MAX_TAGS"
+                           class="w-4 h-4 rounded text-[#CF6B4E] focus:ring-[#CF6B4E] border-gray-300 cursor-pointer disabled:opacity-50">
+                    <span class="text-[13px] font-semibold truncate" [ngClass]="isTagSelected(tag.id) ? 'text-[#a6543b]' : 'text-gray-700'">{{ tag.name }}</span>
+                  </label>
+                }
+              </div>
+              @if (filteredTags().length === 0 && !isLoading()) {
+                <div class="py-8 text-center text-[13px] text-gray-500">
+                  No tags found. Type above and press Enter to create it!
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Selected Tags -->
+      <div class="md:col-span-6 lg:col-span-5 flex flex-col h-full min-h-0 bg-[#FDFBF9]">
+        <div class="p-6 sm:p-8 flex-1 min-h-0 flex flex-col h-full overflow-hidden">
+          <div class="mb-5 shrink-0">
+            <h3 class="text-[15px] font-bold text-gray-900 mb-1">Selected Tags ({{ selectedTags().length }})</h3>
+            <p class="text-[13px] text-gray-500">These tags will be shown on your studio profile.</p>
+          </div>
+          
+          <div class="flex-1 min-h-0 overflow-y-auto content-start items-start pr-2 -mr-2 mb-6">
+            <div class="flex flex-wrap gap-2.5">
+              @for (tag of selectedTags(); track tag.id) {
+                <div class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#F2EDE4] rounded-xl text-[13px] font-semibold text-gray-700 shadow-sm animate-fade-in">
+                  {{ tag.name }}
+                  <button (click)="removeTag(tag.id)" class="text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full p-0.5 transition-colors cursor-pointer ml-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+              }
+              @if (selectedTags().length === 0) {
+                <p class="text-[13px] text-gray-400 italic w-full">No tags selected yet.</p>
+              }
+            </div>
+          </div>
+
+          <!-- Tips Box -->
+          <div class="mt-auto shrink-0 bg-[#FFF5F0]/50 rounded-[16px] p-5 border border-[#F2EDE4]">
+            <h4 class="text-xs font-bold text-gray-900 flex items-center gap-2 mb-3 tracking-wide">
+              <svg class="w-4 h-4 text-[#CF6B4E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.82 1.508-2.316a7.5 7.5 0 10-7.516 0c.85.496 1.508 1.333 1.508 2.316V18"></path></svg>
+              Tips
+            </h4>
+            <ul class="text-[12px] text-gray-600 space-y-2 list-disc pl-4 marker:text-gray-300 font-medium">
+              <li>Select tags that best represent your work</li>
+              <li>Use a mix of predefined and custom tags</li>
+              <li>You can select up to <span [class.text-[#CF6B4E]]="selectedTags().length >= MAX_TAGS">{{ MAX_TAGS }} tags</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-5 sm:px-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-3 bg-white shrink-0 rounded-b-[20px]">
+      <button (click)="onCancel()" class="w-full sm:w-auto px-7 py-2.5 border border-gray-200 text-gray-700 font-semibold text-[13px] rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+      <button (click)="onSave()" [disabled]="isSaving()" class="w-full sm:w-auto px-8 py-2.5 bg-[#CF6B4E] text-white font-semibold text-[13px] rounded-xl hover:bg-[#ba5b40] transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+        @if (isSaving()) {
+          <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...
+        } @else {
+          Save Tags
+        }
+      </button>
+    </div>
+
+  </div>
+</div>
