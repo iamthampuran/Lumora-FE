@@ -1,0 +1,212 @@
+<div [ngClass]="isModal() ? 'fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6' : 'w-full'">
+  
+  <!-- Backdrop -->
+  @if (isModal()) {
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-fade-in" (click)="onCancel()"></div>
+  }
+
+  <!-- Main List Modal -->
+  <div class="bg-white rounded-[20px] shadow-2xl w-full max-w-4xl h-[85vh] sm:h-[80vh] flex flex-col animate-slide-up relative z-10 overflow-hidden"
+       [ngClass]="!isModal() ? 'shadow-sm border border-gray-100 h-auto min-h-[600px]' : ''">
+    
+    <!-- Inner Blur Overlay when Add Modal is open -->
+    @if (isAdding()) {
+      <div class="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-20 transition-all"></div>
+    }
+
+    <!-- Header -->
+    <div class="flex items-start justify-between p-6 sm:px-8 sm:py-6 border-b border-gray-100/50 shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-[#FFF5F0] text-[#CF6B4E] flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path></svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-serif font-bold text-gray-900 leading-tight">Team Members</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Add and manage the people who work with your studio.</p>
+        </div>
+      </div>
+      @if (isModal()) {
+        <button (click)="onCancel()" class="text-gray-400 hover:text-gray-900 transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      }
+    </div>
+
+    <!-- Scrollable List Body -->
+    <div class="px-6 py-6 sm:px-8 sm:py-8 flex-1 overflow-y-auto bg-white">
+      
+      @if (errorMessage()) {
+        <div class="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 text-[13px] font-medium rounded-lg">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- List Header -->
+      <div class="flex justify-between items-end mb-6">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900 mb-1">Your Team <span class="text-gray-400 font-normal text-sm">({{ teamMembers().length }})</span></h3>
+          <p class="text-[13px] text-gray-500">These team members will have access to studio tools based on their roles.</p>
+        </div>
+        <button (click)="openAddModal()" class="px-5 py-2 bg-[#CF6B4E] hover:bg-[#ba5b40] text-white text-[13px] font-semibold rounded-xl flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+          Add Team Member
+        </button>
+      </div>
+
+      <!-- Members List -->
+      <div class="space-y-2">
+        <!-- UPDATED: Tracking by index and exposing let i = $index -->
+        @for (member of teamMembers(); track $index; let i = $index) {
+          <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl hover:shadow-sm transition-shadow group">
+            
+            <div class="flex items-center gap-4 min-w-[240px]">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0" [ngClass]="getAvatarColor(member.fullName)">
+                {{ getInitials(member.fullName) }}
+              </div>
+              <div>
+                <p class="text-[14px] font-bold text-gray-900">{{ member.fullName }}</p>
+                <div class="hidden sm:block mt-1">
+                  <span class="px-2 py-0.5 bg-gray-50 text-gray-600 text-[11px] font-semibold rounded-md border border-gray-200/60">{{ member.role }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hidden md:flex flex-1 items-center justify-end gap-8 pr-4">
+              <div class="flex items-center gap-2 text-[13px] text-gray-600">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.48-4.18-7.076-7.076l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"></path></svg>
+                {{ member.phoneNumber }}
+              </div>
+              <div class="flex items-center gap-2 text-[13px] text-gray-600 w-48">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
+                <span class="truncate">{{ member.email }}</span>
+              </div>
+            </div>
+
+            <!-- UPDATED: Remove Button uses index 'i' -->
+            <button (click)="removeMember(i)" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shrink-0" title="Remove Member">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+          </div>
+        }
+    </div>
+
+    <!-- Main Footer -->
+    <div class="px-6 py-5 sm:px-8 border-t border-gray-100 flex items-center justify-between gap-4 bg-[#FDFBF9] shrink-0 rounded-b-[20px] z-10">
+      <div class="flex items-center gap-2 text-xs text-gray-500 font-medium">
+        <svg class="w-4 h-4 text-[#CF6B4E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.82 1.508-2.316a7.5 7.5 0 10-7.516 0c.85.496 1.508 1.333 1.508 2.316V18"></path></svg>
+        Tip: Assign the right roles to control access to studio tools and features.
+      </div>
+      <div class="flex gap-3">
+        <button (click)="onCancel()" class="px-7 py-2.5 border border-gray-200 text-gray-700 font-semibold text-[13px] rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+        <button (click)="onSave()" [disabled]="isSaving() || teamMembers().length === 0" class="px-8 py-2.5 bg-[#CF6B4E] text-white font-semibold text-[13px] rounded-xl hover:bg-[#ba5b40] transition-colors shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          @if (isSaving()) {
+            <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...
+          } @else {
+            Done
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- NESTED SUB-MODAL (Add Team Member) -->
+    @if (isAdding()) {
+      <div class="absolute inset-0 z-40 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full max-w-xl flex flex-col animate-slide-up border border-gray-100 overflow-hidden">
+          
+          <!-- Sub Modal Header -->
+          <div class="flex items-center justify-between p-6 border-b border-gray-100/50">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-[#FFF5F0] text-[#CF6B4E] flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.66-1.548c0 .674-.251 1.309-.708 1.776a3.42 3.42 0 01-2.452 1.054H6.46a3.42 3.42 0 01-2.452-1.054A3.42 3.42 0 014 19.124v.11z"></path></svg>
+              </div>
+              <div>
+                <h2 class="text-xl font-serif font-bold text-gray-900 leading-tight">Add Team Member</h2>
+                <p class="text-[13px] text-gray-500">Fill in the details to add a new team member.</p>
+              </div>
+            </div>
+            <button (click)="closeAddModal()" class="text-gray-400 hover:text-gray-900 transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          <!-- Sub Modal Form -->
+          <form [formGroup]="memberForm" (ngSubmit)="addMember()" class="p-6 sm:p-8 space-y-6">
+
+            <div>
+              <label class="block text-xs font-bold text-gray-900 mb-1.5">Full Name <span class="text-[#CF6B4E]">*</span></label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path></svg>
+                </div>
+                <input type="text" formControlName="fullName" placeholder="Enter full name" 
+                       class="w-full pl-10 pr-4 py-2.5 text-[13px] border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] transition-colors"
+                       [class.border-red-400]="hasControlError('fullName', 'required')">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-xs font-bold text-gray-900 mb-1.5">Phone Number <span class="text-[#CF6B4E]">*</span></label>
+                <div class="flex">
+                  <div class="inline-flex items-center px-3 text-[13px] font-medium text-gray-700 bg-gray-50 border border-r-0 border-gray-200 rounded-l-xl gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.48-4.18-7.076-7.076l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"></path></svg>
+                    +91
+                  </div>
+                  <input type="tel" formControlName="phoneNumber" (input)="sanitizePhone($event)" placeholder="Enter phone number" 
+                         class="w-full px-3 py-2.5 text-[13px] border border-gray-200 rounded-r-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] transition-colors"
+                         [class.border-red-400]="hasControlError('phoneNumber', 'required') || hasControlError('phoneNumber', 'pattern')">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-gray-900 mb-1.5">Email <span class="text-[#CF6B4E]">*</span></label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"></path></svg>
+                  </div>
+                  <input type="email" formControlName="email" placeholder="Enter email address" 
+                         class="w-full pl-10 pr-4 py-2.5 text-[13px] border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] transition-colors"
+                         [class.border-red-400]="hasControlError('email', 'required') || hasControlError('email', 'email')">
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-900 mb-1.5">Role <span class="text-[#CF6B4E]">*</span></label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"></path></svg>
+                </div>
+                <input type="text" formControlName="role" placeholder="Enter employee role (e.g. Photographer)" 
+                       class="w-full pl-10 pr-4 py-2.5 text-[13px] border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] transition-colors"
+                       [class.border-red-400]="hasControlError('role', 'required')">
+              </div>
+
+              <!-- Popular Roles Quick Select -->
+              <div class="flex flex-wrap items-center gap-2 mt-3">
+                <span class="text-[11px] font-medium text-[#E6B05C] flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-1.82.536l1.282 5.305c.127.526-.415.934-.848.68L12 17.348a.563.563 0 00-.533 0l-4.832 2.68c-.433.254-.975-.154-.848-.68l1.282-5.305a.563.563 0 00-1.82-.536l-4.204-3.602c-.38-.325-.178-.948.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"></path></svg>
+                  Popular roles:
+                </span>
+                @for(role of popularRoles; track role) {
+                  <button type="button" (click)="selectRole(role)" class="text-[11px] font-semibold bg-[#FFF5F0] text-[#CF6B4E] px-2.5 py-1 rounded-md hover:bg-[#CF6B4E] hover:text-white transition-colors cursor-pointer border border-[#CF6B4E]/10">
+                    {{role}}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex gap-3 justify-end">
+              <button type="button" (click)="closeAddModal()" class="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 text-[13px] font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+              <button type="submit" class="px-7 py-2.5 bg-[#CF6B4E] text-white text-[13px] font-semibold rounded-xl hover:bg-[#ba5b40] transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer w-[130px]">
+                Add Member
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

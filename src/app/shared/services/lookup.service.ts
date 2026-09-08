@@ -1,5 +1,5 @@
 import { inject, Injectable, Service } from '@angular/core';
-import { BaseService } from '../base-service';
+import { BaseService } from './base.service';
 import { environment } from '../../../environments/environment';
 import { EventType } from '../models/event-types';
 import { Observable } from 'rxjs';

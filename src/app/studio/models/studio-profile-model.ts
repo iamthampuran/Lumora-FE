@@ -61,3 +61,21 @@ export interface ReviewDetails {
     comment?: string | null;
     date: Date; // Serialized DateTime is typically an ISO 8601 string
 }
+
+export interface UpdateStudioTagsPayload{
+    studioId: string;
+    tagIds: string[];
+    customTagDetails: string[];
+}
+
+export interface EmployeeDetail {
+    name: string;
+    phonenumber: string;
+    email: string;
+    role: string;
+}
+
+export interface AddTeamMembersPayload {
+    studioId: string;
+    employeeDetails: EmployeeDetail[];
+}
