@@ -169,3 +169,12 @@
     (saved)="onTagsSaved()">
   </app-manage-tags>
 }
+
+<!-- Manage Team Modal -->
+@if (activeModal() === 'Team') {
+  <app-manage-teams 
+    [isModal]="true" 
+    (close)="activeModal.set(null)" 
+    (updated)="onTeamUpdated()">
+  </app-manage-teams>
+}

@@ -67,3 +67,15 @@ export interface UpdateStudioTagsPayload{
     tagIds: string[];
     customTagDetails: string[];
 }
+
+export interface EmployeeDetail {
+    name: string;
+    phonenumber: string;
+    email: string;
+    role: string;
+}
+
+export interface AddTeamMembersPayload {
+    studioId: string;
+    employeeDetails: EmployeeDetail[];
+}

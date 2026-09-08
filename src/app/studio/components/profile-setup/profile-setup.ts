@@ -10,10 +10,11 @@ import { UploadLogo } from '../upload-logo/upload-logo';
 import { UploadCover } from '../upload-cover/upload-cover';
 import { UploadPortfolio } from '../upload-portfolio/upload-portfolio';
 import { ManageTags } from '../manage-tags/manage-tags';
+import { ManageTeams } from '../manage-teams/manage-teams';
 
 @Component({
   selector: 'app-profile-setup',
-  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover, UploadPortfolio, ManageTags],
+  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover, UploadPortfolio, ManageTags, ManageTeams],
   templateUrl: './profile-setup.html',
   styleUrl: './profile-setup.css',
 })
@@ -50,7 +51,8 @@ goToSettings(step: ProfileCompletionStep) {
     if (step.title.includes('Logo')) this.activeModal.set('Logo');
     else if (step.title.includes('Cover')) this.activeModal.set('Cover');
     else if (step.title.includes('Photos')) this.activeModal.set('Photos');
-    else if (step.title.includes('Styles')) this.activeModal.set('Styles'); // ADD THIS
+    else if (step.title.includes('Styles')) this.activeModal.set('Styles');
+    else if (step.title.includes('Team')) this.activeModal.set('Team'); // Add This Map
     else this.router.navigate(['/studio/settings']); 
   }
 
@@ -93,6 +95,12 @@ goToSettings(step: ProfileCompletionStep) {
   }
 
   onTagsSaved() {
+    this.activeModal.set(null);
+    this.loadProfileCompletionStatus();
+  }
+
+  // Add the refresh handler
+  onTeamUpdated() {
     this.activeModal.set(null);
     this.loadProfileCompletionStatus();
   }

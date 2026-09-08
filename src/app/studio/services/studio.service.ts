@@ -66,4 +66,11 @@ export class StudioService {
     const url = `${this.baseUrl}/${studioId}/add-studio-tags`;
     return this.baseService.post(url, payload);
   }
+
+  addTeamMembers(studioId: string, payload: any): Observable<any> {
+    // Adjust the endpoint URL to match your backend route perfectly
+    const url = `${this.baseUrl}/${studioId}/add-employee-details`; 
+    return this.baseService.post(url, payload);
+  }
+
 }
