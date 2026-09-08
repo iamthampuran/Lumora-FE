@@ -39,12 +39,22 @@ export class ProfileSetup implements OnInit {
         .getProfileCompletionStatus(studioId)
         .pipe(finalize(() => this.isLoading.set(false)))
         .subscribe({
-          next: (res) => this.completionData.set(res),
+          next: (res) => {
+            this.completionData.set(res);
+            if (this.areAllStepsCompleted(res)) {
+              this.activeModal.set(null);
+              void this.router.navigate(['/studio/dashboard']);
+            }
+          },
           error: (err) => console.error('Error fetching completion status', err),
         });
       return;
     }
     this.isLoading.set(false);
+  }
+
+  private areAllStepsCompleted(data: ProfileCompletionResult): boolean {
+    return (data.steps.length > 0 && data.steps.every((step) => step.isCompleted)) || data.percentage >= 100;
   }
 
 goToSettings(step: ProfileCompletionStep) {
