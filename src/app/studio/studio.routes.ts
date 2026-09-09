@@ -4,6 +4,7 @@ import { StudioDetails } from "./pages/studio-details/studio-details";
 import { profileCompletionGuard } from "../auth/guards/profile-completion.guard";
 import { studioSetupAccessGuard } from "../auth/guards/studio-setup-access.guard";
 import { ProfileSetup } from "./components/profile-setup/profile-setup";
+import { StudioDashboard } from "./components/studio-dashboard/studio-dashboard";
 
 export const StudioRoutes : Routes = [
     {
@@ -14,7 +15,7 @@ export const StudioRoutes : Routes = [
     {
         path: 'dashboard', // <-- Changed from ':studioId'
         canActivate: [profileCompletionGuard], 
-        component: StudioDetails, // (You might want to rename this component to StudioDashboard eventually)
+        component: StudioDashboard, // (You might want to rename this component to StudioDashboard eventually)
     },
     {
         path: '',

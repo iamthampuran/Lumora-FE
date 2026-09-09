@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { StudioProfileModel, UpdateStudioTagsPayload } from '../models/studio-profile-model';
 import { environment } from '../../../environments/environment';
 import { ProfileCompletionResult } from '../models/profile-completion';
+import { StudioDashboardSummary } from '../models/studio-dashboard';
 
 @Service()
 export class StudioService {
@@ -71,6 +72,11 @@ export class StudioService {
     // Adjust the endpoint URL to match your backend route perfectly
     const url = `${this.baseUrl}/${studioId}/add-employee-details`; 
     return this.baseService.post(url, payload);
+  }
+
+  getDashboardSummary(studioId: string): Observable<StudioDashboardSummary> {
+    const url = `${this.baseUrl}/${studioId}/dashboard`;
+    return this.baseService.get(url);
   }
 
 }
