@@ -5,21 +5,31 @@ import { profileCompletionGuard } from "../auth/guards/profile-completion.guard"
 import { studioSetupAccessGuard } from "../auth/guards/studio-setup-access.guard";
 import { ProfileSetup } from "./components/profile-setup/profile-setup";
 import { StudioDashboard } from "./components/studio-dashboard/studio-dashboard";
+import { StudioLayout } from "./components/studio-layout/studio-layout";
 
-export const StudioRoutes : Routes = [
+export const StudioRoutes: Routes = [
     {
+        // Setup gets no layout (full screen)
         path: 'setup',
         canActivate: [studioSetupAccessGuard],
         component: ProfileSetup, 
     },
     {
-        path: 'dashboard', // <-- Changed from ':studioId'
-        canActivate: [profileCompletionGuard], 
-        component: StudioDashboard, // (You might want to rename this component to StudioDashboard eventually)
-    },
-    {
+        // Everything inside here gets the sidebar
         path: '',
-        redirectTo: 'dashboard', // <-- Default to dashboard (the guard will handle kicking them to setup if needed)
-        pathMatch: 'full'
+        component: StudioLayout, 
+        canActivate: [profileCompletionGuard], 
+        children: [
+            {
+                path: 'dashboard',
+                component: StudioDashboard,
+            },
+            // Note: Add Inquiries, Galleries, and Settings routes here as you build them
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            }
+        ]
     }
-]
+];
