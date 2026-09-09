@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-studio-sidebar',
@@ -16,6 +17,7 @@ export class StudioSidebar {
 
   studioName = signal<string>('Studio');
   profileUrl = signal<string | null>(null);
+  isLoggingOut = signal<boolean>(false);
 
   ngOnInit() {
     this.studioName.set(this.authService.getUserDetailsFromToken('unique_name') || 'Studio');
@@ -23,14 +25,20 @@ export class StudioSidebar {
   }
 
   logoutUser(): void {
-    this.authService.logoutUser().subscribe({
-      next: () => {
-        this.authService.clearTokens();
-        void this.router.navigate(['/login']);
-      },
-      error: (error) => {
-        console.error('Error during logout:', error);
-      }
-    });
+    if (this.isLoggingOut()) return;
+
+    this.isLoggingOut.set(true);
+    this.authService
+      .logoutUser()
+      .pipe(finalize(() => this.isLoggingOut.set(false)))
+      .subscribe({
+        next: () => {
+          this.authService.clearTokens();
+          void this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('Error during logout:', error);
+        }
+      });
   }
 }
