@@ -1,0 +1,37 @@
+<div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-bold text-gray-900">Newest Inquiries</h3>
+        <button class="text-sm font-medium text-[#CF6B4E] hover:underline flex items-center gap-1 cursor-pointer">
+          View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </button>
+      </div>
+      
+      @if (inquiries().length === 0) {
+        <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50/60 p-8 text-center">
+          <p class="text-sm font-semibold text-gray-700">No inquiries yet</p>
+          <p class="mt-1 text-xs text-gray-500">New inquiries from clients will show up here.</p>
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for(inquiry of inquiries(); track inquiry.id) {
+            <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer group">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-[#FFF5F0] text-[#CF6B4E] flex items-center justify-center text-sm font-bold shrink-0">
+                  {{ inquiry.initials }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-gray-900">{{ inquiry.clientName }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5">{{ inquiry.eventType }} • {{ inquiry.date }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                @if(inquiry.isNew) {
+                  <span class="px-2.5 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-green-100">New</span>
+                }
+                <svg class="w-5 h-5 text-gray-300 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>

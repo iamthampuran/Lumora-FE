@@ -1,0 +1,31 @@
+<div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-bold text-gray-900">Pending Gallery Approvals</h3>
+        <button class="text-sm font-medium text-[#CF6B4E] hover:underline flex items-center gap-1 cursor-pointer">
+          View All <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        </button>
+      </div>
+      
+      @if (galleries().length === 0) {
+        <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50/60 p-8 text-center">
+          <p class="text-sm font-semibold text-gray-700">No pending galleries</p>
+          <p class="mt-1 text-xs text-gray-500">Client approvals that need action will appear here.</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          @for(gallery of galleries(); track gallery.id) {
+            <div class="group">
+              <div class="aspect-video w-full rounded-xl overflow-hidden mb-4 relative shadow-sm">
+                <img [src]="gallery.coverUrl" alt="Gallery Cover" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/10 transition-opacity group-hover:bg-black/0"></div>
+              </div>
+              <h4 class="text-sm font-bold text-gray-900 mb-1 truncate">{{ gallery.title }}</h4>
+              <p class="text-xs text-gray-500 mb-4">{{ gallery.photoCount }} Photos • {{ gallery.status }}</p>
+              <button class="w-full py-2.5 bg-white border border-gray-200 text-[#CF6B4E] text-sm font-semibold rounded-lg hover:border-[#CF6B4E]/30 hover:bg-orange-50 transition-colors cursor-pointer">
+                {{ gallery.status === 'Waiting for Client' ? 'Remind Client' : 'Review Selections' }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>

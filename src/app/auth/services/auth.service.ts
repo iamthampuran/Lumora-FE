@@ -100,6 +100,7 @@ export class AuthService {
         const role = this.getRole();
         if (role === UserRole.Cosnsumer) return '/consumer/dashboard';
         if (role === UserRole.Studio) {
+            // console.log("Navigating to studio dashboard or setup based on profile completion ", this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup');
             return this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup';
         }
         return '/login';
