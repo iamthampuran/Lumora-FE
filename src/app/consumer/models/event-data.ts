@@ -23,5 +23,6 @@ export interface EventInformationDetails{
     location: {
         latitude: number;
         longitude: number;
+        locationName: string
     }
 }

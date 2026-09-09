@@ -67,19 +67,6 @@ export class EventDetails implements OnInit {
     });
   }
 
-  formatLocation(
-    location:
-      | {
-          latitude: number;
-          longitude: number;
-        }
-      | null
-      | undefined
-  ): string {
-    if (!location) return '-';
-    return `${location.latitude}, ${location.longitude}`;
-  }
-
   formatDuration(duration: number | null | undefined): string {
     if (duration == null) return '-';
     if (duration === 1) return '1 Hour';
