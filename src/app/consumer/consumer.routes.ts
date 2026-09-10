@@ -4,6 +4,7 @@ import { CreateEvent } from './components/create-event/create-event';
 import { EventDetails } from './components/event-details/event-details';
 import { ListEvents } from './components/list-events/list-events';
 import { ConsumerLayout } from './components/consumer-layout/consumer-layout';
+import { BrowseStudios } from './components/browse-studios/browse-studios';
 
 export const ConsumerRoutes: Routes = [
   {
@@ -21,6 +22,10 @@ export const ConsumerRoutes: Routes = [
       {
         path: 'events/:id',
         component: EventDetails,
+      },
+      {
+        path: 'events/:id/studios',
+        component: BrowseStudios,
       },
       {
         path: 'events',

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { EventData } from '../../models/event-data';
 import { ConsumerService } from '../../services/consumer.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 
@@ -17,6 +17,7 @@ export class EventDetails implements OnInit {
   errorMessage = signal<string | null>(null);
   consumerService = inject(ConsumerService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
   readonly eventInfo = computed(() => this.eventData()?.eventInformationDetails ?? null);
   readonly inquiryDetails = computed(() => this.eventData()?.inquiryDetails ?? []);
@@ -118,6 +119,13 @@ export class EventDetails implements OnInit {
 
   getInquiryLogoClass(status: string): string {
     return status === 'accepted' ? 'bg-gray-900 text-white' : 'bg-[#ECE5DA] text-gray-600';
+  }
+
+  browseStudios() {
+    const eventId = this.route.snapshot.paramMap.get('id');
+    if (eventId) {
+      this.router.navigate(['/consumer/events', eventId, 'studios']);
+    }
   }
 
 }
