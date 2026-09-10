@@ -23,9 +23,15 @@ type StudioFormGroup = {
   locationName: FormControl<string>;
   latitude: FormControl<number>;
   longitude: FormControl<number>;
-  serviceRadiusKm: FormControl<number>;
+  serviceRadius: FormControl<number>;
   minPrice: FormControl<number>;
   maxPrice: FormControl<number>;
+};
+
+type SelectedStudioLocation = {
+  locationName: string;
+  latitude: number;
+  longitude: number;
 };
 
 @Component({
@@ -41,6 +47,7 @@ export class CreatestudioComponent {
   readonly isCreatingStudio = signal(false);
   readonly loaderComponent = LoaderComponent;
   readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
+  readonly selectedLocation = signal<SelectedStudioLocation | null>(null);
 
   private map: L.Map | null = null;
   private marker: L.Marker | null = null;
@@ -68,7 +75,7 @@ export class CreatestudioComponent {
     locationName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     latitude: new FormControl(0, { nonNullable: true }),
     longitude: new FormControl(0, { nonNullable: true }),
-    serviceRadiusKm: new FormControl(0, {
+    serviceRadius: new FormControl(0, {
       nonNullable: true,
       validators: [Validators.required, Validators.pattern(/^\d+(\.\d+)?$/)],
     }),
@@ -125,7 +132,7 @@ export class CreatestudioComponent {
     input.value = sanitized;
   }
 
-  sanitizeDecimalInput(controlName: 'serviceRadiusKm' | 'minPrice' | 'maxPrice', event: Event): void {
+  sanitizeDecimalInput(controlName: 'serviceRadius' | 'minPrice' | 'maxPrice', event: Event): void {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/[^0-9.]/g, '');
     const parts = value.split('.');
@@ -178,7 +185,7 @@ export class CreatestudioComponent {
     this.normalizeStringControl('phoneNumber');
     this.normalizeStringControl('website');
     this.normalizeStringControl('locationName');
-    this.normalizeStringControl('serviceRadiusKm');
+    this.normalizeStringControl('serviceRadius');
     this.normalizeStringControl('minPrice');
     this.normalizeStringControl('maxPrice');
   }
@@ -222,7 +229,7 @@ export class CreatestudioComponent {
       studioName: payload.studioName,
       description: payload.description,
       website: payload.website,
-      serviceRadiusKm: payload.serviceRadiusKm,
+      serviceRadius: payload.serviceRadius,
       minPrice: payload.minPrice,
       maxPrice: payload.maxPrice,
       locationName: payload.locationName,
@@ -355,11 +362,19 @@ export class CreatestudioComponent {
     }
 
     this.locationError.set('');
+    this.selectedLocation.set({
+      locationName,
+      latitude: lat,
+      longitude: lng,
+    });
     this.formGroup.patchValue({
       locationName,
       latitude: lat,
       longitude: lng,
     });
+    this.formGroup.controls.locationName.markAsDirty();
+    this.formGroup.controls.latitude.markAsDirty();
+    this.formGroup.controls.longitude.markAsDirty();
   }
 
   private async getApproximateLocationName(lat: number, lng: number): Promise<string> {

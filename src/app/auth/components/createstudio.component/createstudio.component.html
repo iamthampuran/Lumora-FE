@@ -206,7 +206,7 @@
         <div
           class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 min-h-11"
         >
-          {{ formGroup.controls.locationName.value || 'No location selected yet' }}
+          {{ selectedLocation()?.locationName || 'No location selected yet' }}
         </div>
         @if (hasControlError('locationName', 'required')) {
           <p class="text-xs text-red-600 mt-1.5">Please select your studio location on the map.</p>
@@ -221,11 +221,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
           <p class="text-[10px] font-bold tracking-wide uppercase text-gray-500 mb-1">Latitude</p>
-          <p class="text-sm text-gray-700">{{ formGroup.controls.latitude.value || 'Not selected' }}</p>
+          <p class="text-sm text-gray-700">{{ selectedLocation()?.latitude ?? 'Not selected' }}</p>
         </div>
         <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl">
           <p class="text-[10px] font-bold tracking-wide uppercase text-gray-500 mb-1">Longitude</p>
-          <p class="text-sm text-gray-700">{{ formGroup.controls.longitude.value || 'Not selected' }}</p>
+          <p class="text-sm text-gray-700">{{ selectedLocation()?.longitude ?? 'Not selected' }}</p>
         </div>
       </div>
     </div>
@@ -243,8 +243,8 @@
           <input
             type="text"
             inputmode="decimal"
-            formControlName="serviceRadiusKm"
-            (input)="sanitizeDecimalInput('serviceRadiusKm', $event)"
+            formControlName="serviceRadius"
+            (input)="sanitizeDecimalInput('serviceRadius', $event)"
             placeholder="e.g. 50"
             class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-l-xl focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] outline-none text-gray-900"
           />
@@ -254,9 +254,9 @@
             km
           </span>
         </div>
-        @if (hasControlError('serviceRadiusKm', 'required')) {
+        @if (hasControlError('serviceRadius', 'required')) {
           <p class="text-xs text-red-600 mt-1.5">Service radius is required.</p>
-        } @else if (hasControlError('serviceRadiusKm', 'pattern')) {
+        } @else if (hasControlError('serviceRadius', 'pattern')) {
           <p class="text-xs text-red-600 mt-1.5">Use numbers only (decimals allowed).</p>
         }
       </div>
