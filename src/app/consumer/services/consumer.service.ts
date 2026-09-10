@@ -8,6 +8,9 @@ import { HttpParams } from '@angular/common/http';
 import { InquiryWidget } from '../models/inquiry-widget';
 import { EventData } from '../models/event-data';
 import { EventFilterPayload } from '../../shared/models/event-filter';
+import { PaginatedResponse } from '../../shared/models/paginated-response';
+import { FindStudiosQueryResponse } from '../models/find-studios';
+import { StudioSortOption } from '../enums/studio.sort.option';
 
 @Injectable({
     providedIn: 'root'
@@ -67,5 +70,30 @@ export class ConsumerService {
         const baseUrl = `${this.baseUrl}/event/${eventId}`;
         return this.baseService.get(baseUrl);
     }
+
+    getStudioRecommendationsForEvent(
+    eventId: string,
+    pageCount: number,
+    pageSize: number,
+    sortOption: StudioSortOption,
+    maxDistance?: number | null,
+    minRatings?: number | null
+  ): Observable<PaginatedResponse<FindStudiosQueryResponse>> {
+    const url = `${this.baseUrl}/event/${eventId}/get-studios`;
+    
+    let params = new HttpParams()
+      .set('PageCount', pageCount.toString())
+      .set('PageSize', pageSize.toString())
+      .set('studioSortOption', sortOption.toString());
+
+    if (maxDistance != null) {
+      params = params.set('MaxDistance', maxDistance.toString());
+    }
+    if (minRatings != null) {
+      params = params.set('MinRatings', minRatings.toString());
+    }
+
+    return this.baseService.get(url, params);
+  }
 
 }

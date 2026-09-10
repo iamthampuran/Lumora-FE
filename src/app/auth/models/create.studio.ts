@@ -4,7 +4,8 @@ export interface CreateStudio{
     description: string | null;
     phoneNumber: string;
     website: string | null;
-    serviceRadiusKm: number;
+    locationName: string;
+    serviceRadius: number;
     minPrice: number;
     maxPrice: number;
     latitude: number;
