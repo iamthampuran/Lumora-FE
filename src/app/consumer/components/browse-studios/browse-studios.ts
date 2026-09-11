@@ -167,7 +167,10 @@ export class BrowseStudios implements OnInit {
     this.loadStudios();
   }
 
-  toggleFavorite(id: string) {
+  toggleFavorite(event: Event, id: string) {
+    event.stopPropagation(); // Prevents the card click from firing
+    event.preventDefault();
+    
     const current = new Set(this.favorites());
     if (current.has(id)) {
       current.delete(id);
@@ -188,5 +191,12 @@ export class BrowseStudios implements OnInit {
   onDistanceChange(event: Event) {
     const val = (event.target as HTMLSelectElement).value;
     this.tempDistance.set(val === 'Any' ? -1 : parseInt(val, 10));
+  }
+
+  viewStudioDetails(studioId: string) {
+    const currentEventId = this.eventId();
+    if (currentEventId) {
+      this.router.navigate(['/consumer/events', currentEventId, 'studios', studioId]);
+    }
   }
 }
