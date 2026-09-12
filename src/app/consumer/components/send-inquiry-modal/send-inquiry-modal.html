@@ -1,0 +1,46 @@
+<!-- Event Summary Banner -->
+      <div class="bg-[#FFF8F5] border border-orange-50 rounded-xl p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 min-h-[80px]">
+        @if (isLoadingEvent()) {
+          <div class="flex items-center justify-center w-full gap-3 text-[#CF6B4E]">
+            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span class="text-sm font-medium">Loading event details...</span>
+          </div>
+        } @else {
+          <!-- Event Type -->
+          <div class="flex items-center gap-3">
+            <div class="text-[#CF6B4E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Event</p>
+              <p class="text-[13px] font-semibold text-gray-900 leading-tight">{{ eventType() }}</p>
+            </div>
+          </div>
+          
+          <div class="hidden sm:block w-px h-8 bg-orange-100"></div>
+          
+          <!-- Event Date -->
+          <div class="flex items-center gap-3">
+            <div class="text-[#CF6B4E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Event Date</p>
+              <p class="text-[13px] font-semibold text-gray-900 leading-tight">{{ eventDate() }}</p>
+            </div>
+          </div>
+
+          <div class="hidden sm:block w-px h-8 bg-orange-100"></div>
+
+          <!-- Location -->
+          <div class="flex items-center gap-3">
+            <div class="text-[#CF6B4E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"></path></svg>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Location</p>
+              <p class="text-[13px] font-semibold text-gray-900 leading-tight truncate max-w-[120px]" [title]="eventLocation()">{{ eventLocation() }}</p>
+            </div>
+          </div>
+        }
+      </div>

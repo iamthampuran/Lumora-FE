@@ -5,10 +5,12 @@ import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConsumerStudioDetailsResponse } from '../../models/consumer-studio.model';
 import { finalize } from 'rxjs';
+import { SendInquiryModal } from '../send-inquiry-modal/send-inquiry-modal';
+import { EventData } from '../../models/event-data';
 
 @Component({
   selector: 'app-consumer-studio-details',
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, SendInquiryModal],
   templateUrl: './consumer-studio-details.html',
   styleUrl: './consumer-studio-details.css',
 })
@@ -20,9 +22,10 @@ export class ConsumerStudioDetails implements OnInit {
 
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
-  studioData = signal<ConsumerStudioDetailsResponse | null>(null);
   
+  studioData = signal<ConsumerStudioDetailsResponse | null>(null);
   eventId = signal<string | null>(null);
+  isModalOpen = signal<boolean>(false);
 
   ngOnInit(): void {
     const studioId = this.route.snapshot.paramMap.get('studioId');
@@ -60,5 +63,18 @@ export class ConsumerStudioDetails implements OnInit {
 
   getInitial(name: string): string {
     return name ? name.charAt(0).toUpperCase() : '?';
+  }
+
+  openInquiryModal() {
+    this.isModalOpen.set(true);
+  }
+
+  closeInquiryModal() {
+    this.isModalOpen.set(false);
+  }
+
+  handleInquirySubmission(payload: { message: string, proposedAmount: number | null }) {
+    console.log('Submitting inquiry payload:', payload);
+    // TODO: Finalize with ConsumerService API call
   }
 } 
