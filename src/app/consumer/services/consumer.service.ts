@@ -11,6 +11,8 @@ import { EventFilterPayload } from '../../shared/models/event-filter';
 import { PaginatedResponse } from '../../shared/models/paginated-response';
 import { FindStudiosQueryResponse } from '../models/find-studios';
 import { StudioSortOption } from '../enums/studio.sort.option';
+import { ConsumerStudioDetailsResponse } from '../models/consumer-studio.model';
+import { CreateInquiryPayload } from '../models/create-inquiry';
 
 @Injectable({
     providedIn: 'root'
@@ -94,6 +96,18 @@ export class ConsumerService {
     }
 
     return this.baseService.get(url, params);
+  }
+
+  getStudioDetailsForEvent(studioId: string, eventId: string): Observable<ConsumerStudioDetailsResponse> {
+    // Reaching outside the standard consumer baseUrl based on your Swagger screenshot
+    const url = `${this.baseUrl}/studio-details/${studioId}`;
+    const params = new HttpParams().set('eventId', eventId);
+    return this.baseService.get(url, params);
+  }
+  
+  createInquiry(consumerId: string, payload: CreateInquiryPayload): Observable<any> {
+  const url = `${this.baseUrl}/${consumerId}/create/inquiry`;
+  return this.baseService.post(url, payload);
   }
 
 }

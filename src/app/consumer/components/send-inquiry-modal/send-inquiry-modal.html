@@ -1,0 +1,144 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity animate-fade-in" (click)="onCancel()"></div>
+
+  <!-- Modal Dialog Card -->
+  <div class="bg-white rounded-[20px] shadow-2xl w-full max-w-2xl overflow-hidden animate-slide-up relative z-10 flex flex-col max-h-[90vh]">
+    
+    <!-- Header -->
+    <div class="flex items-start justify-between p-6 border-b border-gray-100/60 shrink-0">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-[#FFF5F0] text-[#CF6B4E] flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.125A59.769 59.769 0 0121.485 12 59.768 59.768 0 013.27 20.875L5.999 12zm0 0h7.5" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-2xl font-serif font-bold text-gray-900 leading-tight">Send Inquiry</h2>
+          <p class="text-xs text-gray-500 mt-0.5">To {{ studioName() }} &bull; {{ studioLocation() }}</p>
+        </div>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-900 transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Scrollable Body -->
+    <div class="p-6 overflow-y-auto space-y-6">
+      <!-- Event Summary Banner -->
+      <div class="bg-[#FFF8F5] border border-orange-50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 min-h-[70px]">
+        @if (isLoadingEvent()) {
+          <div class="flex items-center justify-center w-full gap-3 text-[#CF6B4E] py-2">
+            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="text-xs font-medium">Loading event details...</span>
+          </div>
+        } @else {
+          <!-- Event Type -->
+          <div class="flex items-center gap-3">
+            <div class="text-[#CF6B4E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                <line x1="16" x2="16" y1="2" y2="6"></line>
+                <line x1="8" x2="8" y1="2" y2="6"></line>
+                <line x1="3" x2="21" y1="10" y2="10"></line>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Event</p>
+              <p class="text-[13px] font-semibold text-gray-900 leading-tight">{{ eventType() }}</p>
+            </div>
+          </div>
+
+          <div class="hidden sm:block w-px h-8 bg-orange-100"></div>
+
+          <!-- Event Date -->
+          <div class="flex items-center gap-3">
+            <div class="text-[#CF6B4E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                <path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Event Date</p>
+              <p class="text-[13px] font-semibold text-gray-900 leading-tight">{{ eventDate() }}</p>
+            </div>
+          </div>
+
+          <div class="hidden sm:block w-px h-8 bg-orange-100"></div>
+
+          <!-- Location -->
+          <div class="flex items-center gap-3">
+            <div class="text-[#CF6B4E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Location</p>
+              <p class="text-[13px] font-semibold text-gray-900 leading-tight truncate max-w-[140px]" [title]="eventLocation()">{{ eventLocation() }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Error Message Banner -->
+      @if (errorMessage()) {
+        <div class="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs font-medium rounded-xl">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- Proposed Budget (Optional) -->
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">Proposed Budget (₹, Optional)</label>
+        <input 
+          type="number" 
+          [ngModel]="proposedAmount()" 
+          (ngModelChange)="proposedAmount.set($event)" 
+          placeholder="Enter proposed amount"
+          class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] bg-white transition-colors" />
+      </div>
+
+      <!-- Message to Studio -->
+      <div>
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">Message / Inquiry Details</label>
+        <textarea 
+          rows="4" 
+          [ngModel]="messageText()" 
+          (ngModelChange)="messageText.set($event)"
+          placeholder="Describe your vision, schedule, or questions for the studio..."
+          class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-[#CF6B4E] focus:border-[#CF6B4E] bg-white transition-colors resize-none"></textarea>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-[#FAF8F5] shrink-0">
+      <button 
+        type="button" 
+        (click)="onCancel()" 
+        class="px-6 py-2.5 border border-gray-200 text-gray-700 font-semibold text-sm rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
+        Cancel
+      </button>
+      <button 
+        type="button" 
+        (click)="onSend()" 
+        [disabled]="isSubmitting()" 
+        class="px-7 py-2.5 bg-[#C45A3E] hover:bg-[#b04a2e] text-white font-semibold text-sm rounded-xl transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2 cursor-pointer">
+        @if (isSubmitting()) {
+          <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Sending...
+        } @else {
+          Send Inquiry
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

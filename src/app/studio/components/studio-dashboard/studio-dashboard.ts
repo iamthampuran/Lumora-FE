@@ -78,7 +78,7 @@ export class StudioDashboard implements OnInit {
         ...this.emptyStats,
         ...(data?.stats ?? {}),
       },
-      recentInquiries: data?.recentInquiries ?? [],
+      inquiryDetails: data?.inquiryDetails ?? [],
       pendingGalleries: data?.pendingGalleries ?? [],
       reviewsSummary: {
         ...this.emptyReviews,

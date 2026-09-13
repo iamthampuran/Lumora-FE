@@ -1,5 +1,5 @@
 export interface FindStudiosQueryResponse {
-    id: string;
+    studioId: string;
     name: string;
     rating: number;
     reviewCount: number;
