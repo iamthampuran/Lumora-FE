@@ -8,10 +8,10 @@ export interface DashboardStats {
 
 export interface RecentInquiry {
   id: string;
-  clientName: string;
+  createdUser: string;
   initials: string;
   eventType: string;
-  date: string;
+  eventDate: string;
   isNew: boolean;
 }
 
@@ -35,7 +35,7 @@ export interface DashboardReviewSummary {
 
 export interface StudioDashboardSummary {
   stats: DashboardStats;
-  recentInquiries: RecentInquiry[];
+  inquiryDetails: RecentInquiry[];
   pendingGalleries: PendingGallery[];
   reviewsSummary: DashboardReviewSummary;
 }

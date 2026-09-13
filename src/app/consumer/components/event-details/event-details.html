@@ -216,7 +216,7 @@
             <div class="space-y-4">
               @for (inquiry of inquiryDetails(); track inquiry.id) {
                 <!-- Conditional Rendering based on Status -->
-                @if (inquiry.inquiryStatus === 'pending') {
+                @if (inquiry.inquiryStatus === 'Submitted') {
                   <!-- Pending Card Layout -->
                   <div class="rounded-xl p-5" [class]="getInquiryCardClass(inquiry.inquiryStatus)">
                     <div class="flex items-center gap-4 mb-4">
@@ -244,7 +244,7 @@
                       >
                         {{ getInquiryBadgeLabel(inquiry.inquiryStatus) }}
                       </span>
-                      <button class="text-gray-400 hover:text-gray-600">
+                      <button class="text-gray-400 hover:text-gray-600 cursor-pointer">
                         <svg
                           class="w-5 h-5"
                           fill="none"

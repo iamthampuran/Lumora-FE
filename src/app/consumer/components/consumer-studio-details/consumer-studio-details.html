@@ -528,16 +528,17 @@
  } <!-- End of @if (studioData(); as data) -->
 
 <!-- Modal Rendering -->
-  @if (isModalOpen() && studioData() && eventId()) {
+ @if (isModalOpen() && studioData() && eventId()) {
     <app-send-inquiry-modal
       [isModalOpen]="isModalOpen()"
+      [studioId]="studioData()!.identity.id"
       [studioName]="studioData()!.identity.studioName"
       [studioLogo]="studioData()!.identity.logoUrl ?? null"
       [studioLocation]="studioData()!.generalInformation.locationDetails.city"
       [eventId]="eventId()!"
       (closeModal)="closeInquiryModal()"
-      (submitInquiry)="handleInquirySubmission($event)"
-    ></app-send-inquiry-modal>
+      (inquirySubmitted)="onInquirySubmitted()">
+    </app-send-inquiry-modal>
   }
 
 </div> <!-- End of wrapper -->

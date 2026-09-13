@@ -73,8 +73,11 @@ export class ConsumerStudioDetails implements OnInit {
     this.isModalOpen.set(false);
   }
 
-  handleInquirySubmission(payload: { message: string, proposedAmount: number | null }) {
-    console.log('Submitting inquiry payload:', payload);
-    // TODO: Finalize with ConsumerService API call
+  onInquirySubmitted() {
+    this.closeInquiryModal();
+    const currentEventId = this.eventId();
+    if (currentEventId) {
+      void this.router.navigate(['/consumer/events', currentEventId]);
+    }
   }
 } 

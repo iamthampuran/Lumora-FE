@@ -10,4 +10,16 @@ import { RecentInquiry } from '../../models/studio-dashboard';
 })
 export class DashboardInquiries {
   inquiries = input.required<RecentInquiry[]>();
+
+  getInitials(name: string): string {
+    if (!name) return '?';
+
+    const parts = name.trim().split(/\s+/);
+
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    return name.substring(0, 2).toUpperCase();
+  }
 }

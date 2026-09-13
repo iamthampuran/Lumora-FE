@@ -7,7 +7,7 @@
   @if (hasInquiries()) {
     <div class="space-y-4 flex-1">
       @for (inquiry of inquiryCards(); track inquiry.inquiryId) {
-        <div class="flex gap-3 pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+        <div class="flex gap-3 pb-4 border-b border-gray-50 last:border-0 last:pb-0 cursor-pointer">
           <div class="w-8 h-8 rounded-full bg-orange-50 text-[#8C5A2B] flex items-center justify-center shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           </div>
@@ -35,7 +35,7 @@
       }
     </div>
 
-    <button class="w-full mt-6 py-3 border border-orange-200 text-[#CF6B4E] rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors flex justify-center items-center gap-2">
+    <button class="w-full mt-6 py-3 border border-orange-200 text-[#CF6B4E] rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors flex justify-center items-center gap-2 cursor-pointer">
       View All Inquiries
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
     </button>
