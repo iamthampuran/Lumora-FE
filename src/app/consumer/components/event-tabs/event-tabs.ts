@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, ElementRef, HostListener, inject, input, output, signal } from '@angular/core';
 import { EventStatus } from '../../enums/event.status.enum';
 import { EventDetails } from '../../models/event-dashboard';
 import { Router } from '@angular/router';
@@ -16,6 +16,10 @@ export class EventTabs {
   readonly statusChanged = output<EventStatus>();
 
   private router = inject(Router);
+  private eRef = inject(ElementRef); // <-- Added for click-outside detection
+
+  // <-- NEW: State for dropdown menu
+  openMenuId = signal<string | null>(null)
 
  readonly mappedEvents = computed(() => {
     return this.actualEvents().slice(0, 3).map((event) => {
@@ -35,6 +39,31 @@ export class EventTabs {
       };
     });
   });
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: Event) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.openMenuId.set(null);
+    }
+  }
+
+  toggleMenu(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.update(id => id === eventId ? null : eventId);
+  }
+
+  editEvent(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    this.router.navigate(['/consumer/events', eventId, 'edit']);
+  }
+
+  deleteEvent(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    // TODO: Connect this to the ConsumerService to actually delete
+    console.log('Delete event clicked for:', eventId);
+  }
 
   setActiveTab(tab: EventStatus): void {
     this.activeTab.set(tab);

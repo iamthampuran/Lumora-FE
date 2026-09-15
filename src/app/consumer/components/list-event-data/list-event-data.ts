@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, computed, effect, ElementRef, HostListener, inject, input, signal, untracked } from '@angular/core';
 import { EventStatus } from '../../enums/event.status.enum';
 import { finalize } from 'rxjs';
 import { Router } from '@angular/router';
@@ -32,6 +32,8 @@ export class ListEventData {
   consumerService = inject(ConsumerService);
   authService = inject(AuthService);
   router = inject(Router);
+  private eRef = inject(ElementRef);
+  openMenuId = signal<string | null>(null);
 
   protected readonly Math = Math;
 
@@ -73,6 +75,30 @@ export class ListEventData {
   });
 
   totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.pageSize())));
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: Event) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.openMenuId.set(null);
+    }
+  }
+
+  toggleMenu(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.update(id => id === eventId ? null : eventId);
+  }
+
+  editEvent(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    this.router.navigate(['/consumer/events', eventId, 'edit']);
+  }
+
+  deleteEvent(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    console.log('Delete event not yet implemented for:', eventId);
+  }
 
   setPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {

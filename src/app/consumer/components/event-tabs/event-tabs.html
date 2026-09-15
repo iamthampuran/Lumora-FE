@@ -159,23 +159,39 @@
           >
             {{ getPrimaryActionLabel() }}
           </button>
-          <button
-            class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
+          <div class="relative">
+            <button
+              (click)="toggleMenu($event, event.id)"
+              class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-              ></path>
-            </svg>
-          </button>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                ></path>
+              </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            @if (openMenuId() === event.id) {
+              <div class="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-20 py-2 animate-fade-in overflow-hidden">
+                <button (click)="editEvent($event, event.id)" class="w-full text-left px-4 py-2 text-[13px] font-medium text-gray-700 hover:bg-orange-50 hover:text-[#CF6B4E] transition-colors cursor-pointer">
+                  Edit Event
+                </button>
+                <div class="h-px w-full bg-gray-50 my-1"></div>
+                <button (click)="deleteEvent($event, event.id)" class="w-full text-left px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
+                  Delete Event
+                </button>
+              </div>
+            }
+          </div>
         </div>
       </div>
     }

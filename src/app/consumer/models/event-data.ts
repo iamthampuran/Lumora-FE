@@ -26,3 +26,20 @@ export interface EventInformationDetails{
         locationName: string
     }
 }
+
+export interface EventEditDetails {
+  id: string;
+  consumerId: string;
+  title: string;
+  eventDate: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    locationName: string;
+  };
+  eventTypeId: string;
+  budget: number;
+  duration: number;
+  specialRequirements: string | null;
+  tags: Record<string, string>; 
+}
