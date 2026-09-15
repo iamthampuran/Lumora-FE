@@ -5,13 +5,15 @@ import * as L from 'leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { EventType } from '../../../shared/models/event-types';
 import { LookupService } from '../../../shared/services/lookup.service';
 import { Tag } from '../../../shared/models/tags';
 import { AuthService } from '../../../auth/services/auth.service';
 import { ConsumerService } from '../../services/consumer.service';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
+import { ActivatedRoute } from '@angular/router';
+import { EventEditDetails } from '../../models/event-data';
 
 @Component({
   selector: 'app-create-event',
@@ -26,6 +28,8 @@ export class CreateEvent implements OnInit {
   private authService = inject(AuthService);
   private consumerService = inject(ConsumerService);
   private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
+  
   private readonly otherCategoryValue = 'Other';
 
   // MODERN ANGULAR 22: Signal-based ViewChild
@@ -44,6 +48,8 @@ export class CreateEvent implements OnInit {
   private pendingRequests = 0;
   eventTypes = signal<EventType[]>([]);
   tags = signal<Tag[]>([]);
+  isEditMode = signal<boolean>(false);
+  editEventId = signal<string | null>(null);
 
   // Reactive Form Setup with Nested Groups per step
   eventForm: FormGroup = this.fb.group({
@@ -105,7 +111,50 @@ export class CreateEvent implements OnInit {
   ngOnInit(): void {
     this.getCategories();
     this.getTags();
-    console.log('Categories fetched:', this.eventTypes());
+
+    const id = this.route.snapshot.paramMap.get('id');
+    const isEditRoute = this.route.snapshot.url.some(segment => segment.path === 'edit');
+    
+    if (id && isEditRoute) {
+      this.isEditMode.set(true);
+      this.editEventId.set(id);
+      this.loadEventData(id);
+    }
+  }
+
+  loadEventData(id: string) {
+    this.startLoading();
+    this.consumerService.getEventById(id).pipe(finalize(() => this.stopLoading())).subscribe({
+      next: (event: EventEditDetails) => {
+        // Safe extraction
+        const formattedDate = event.eventDate ? event.eventDate.split('T')[0] : '';
+        const tagIds = event.tags ? Object.keys(event.tags) : [];
+
+        this.eventForm.patchValue({
+          basics: {
+            title: event.title,
+            categoryId: event.eventTypeId,
+            date: formattedDate,
+            duration: event.duration,
+            budget: event.budget
+          },
+          location: {
+            venue: event.location?.locationName,
+            latitude: event.location?.latitude,
+            longitude: event.location?.longitude
+          },
+          style: {
+            tags: tagIds,
+            specialRequirements: event.specialRequirements
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load event details', err);
+        this.snackBar.open('Unable to load event details. Please try again.', 'Close', { duration: 3000 });
+        this.router.navigate(['/consumer/dashboard']);
+      }
+    });
   }
 
   isOtherCategorySelected(): boolean {
@@ -437,30 +486,22 @@ export class CreateEvent implements OnInit {
     customCategoryControl.updateValueAndValidity();
   }
 
-  submitEvent() {
+submitEvent() {
     if (this.eventForm.valid) {
       const formValue = this.eventForm.value;
 
-      // Prepare the exact payload you described
       let finalCategoryId = formValue.basics.categoryId;
       let finalCustomCategory = formValue.basics.customCategory;
 
-      // If 'Other' is selected, set categoryId to null
       if (finalCategoryId === this.otherCategoryValue) {
         finalCategoryId = null;
       } else {
-        // Just an extra safety net, onCategoryChange already handles this
         finalCustomCategory = null;
       }
 
       const consumerId = this.authService.getRoleScopedProfileId();
-      if (!consumerId){
-        this.snackBar.open('Could not create event. Consumer profile not found.', 'Close', {
-          duration: 3500,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        });
-        console.error('Consumer ID not found');
+      if (!consumerId) {
+        this.snackBar.open('Consumer profile not found.', 'Close', { duration: 3500 });
         return;
       }
 
@@ -481,33 +522,41 @@ export class CreateEvent implements OnInit {
         specialRequirements: formValue.style.specialRequirements || null,
       };
 
-      console.log('Event Created Successfully! Payload:', commandPayload);
       this.startLoading();
-      this.consumerService.createEvent(consumerId, commandPayload)
-      .pipe(finalize(() => this.stopLoading()))
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Event created successfully.', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-          });
-          void this.router.navigate(['/consumer/dashboard']);
-        },
-        error: (error) => {
-          const apiMessage = error?.error?.message;
-          const message = typeof apiMessage === 'string' && apiMessage.trim().length > 0
-            ? apiMessage
-            : 'Failed to create event. Please try again.';
-          this.snackBar.open(message, 'Close', {
-            duration: 4500,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-          });
-          console.error('Error creating event:', error);
-        },
-      });
 
+      // <-- NEW: Branch logic based on Edit Mode vs Create Mode
+      if (this.isEditMode() && this.editEventId()) {
+        
+        // Ensure ID is passed dynamically to the payload if your backend C# expects it inside the body
+        const updatePayload = { ...commandPayload, id: this.editEventId() };
+
+        this.consumerService.updateEvent(this.editEventId()!, updatePayload)
+          .pipe(finalize(() => this.stopLoading()))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Event updated successfully.', 'Close', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top' });
+              void this.router.navigate(['/consumer/events', this.editEventId()]);
+            },
+            error: (error) => {
+              const msg = error?.error?.message || 'Failed to update event.';
+              this.snackBar.open(msg, 'Close', { duration: 4500, horizontalPosition: 'right', verticalPosition: 'top' });
+            }
+          });
+      } else {
+        // Standard Create Mode
+        this.consumerService.createEvent(consumerId, commandPayload)
+          .pipe(finalize(() => this.stopLoading()))
+          .subscribe({
+            next: () => {
+              this.snackBar.open('Event created successfully.', 'Close', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top' });
+              void this.router.navigate(['/consumer/dashboard']);
+            },
+            error: (error) => {
+              const msg = error?.error?.message || 'Failed to create event.';
+              this.snackBar.open(msg, 'Close', { duration: 4500, horizontalPosition: 'right', verticalPosition: 'top' });
+            }
+          });
+      }
     }
   }
 

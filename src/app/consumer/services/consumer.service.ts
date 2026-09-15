@@ -6,7 +6,7 @@ import { EventDashboard } from '../models/event-dashboard';
 import { EventStatus } from '../enums/event.status.enum';
 import { HttpParams } from '@angular/common/http';
 import { InquiryWidget } from '../models/inquiry-widget';
-import { EventData } from '../models/event-data';
+import { EventData, EventEditDetails } from '../models/event-data';
 import { EventFilterPayload } from '../../shared/models/event-filter';
 import { PaginatedResponse } from '../../shared/models/paginated-response';
 import { FindStudiosQueryResponse } from '../models/find-studios';
@@ -110,4 +110,19 @@ export class ConsumerService {
   return this.baseService.post(url, payload);
   }
 
+  updateEvent(eventId: string, payload: object): Observable<any> {
+    const url = `${environment.apiUrl}/event/${eventId}`;
+    return this.baseService.put(url, payload);
+  }
+
+  getEventById(eventId: string): Observable<EventEditDetails> {
+    const url = `${this.baseUrl}/get-event-details-for-edit/${eventId}`;
+    return this.baseService.get(url);
+  }
+
+  deleteEvent(eventId: string): Observable<any> {
+    // Uses the base environment URL, not the consumer profile prefix, matching your swagger
+    const url = `${environment.apiUrl}/Event/${eventId}`;
+    return this.baseService.delete(url);
+  }
 }

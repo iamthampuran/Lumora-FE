@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, computed, effect, ElementRef, HostListener, inject, input, signal, untracked } from '@angular/core';
 import { EventStatus } from '../../enums/event.status.enum';
 import { finalize } from 'rxjs';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { ConsumerService } from '../../services/consumer.service';
 import { EventDetails } from '../../models/event-dashboard';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { EventFilterPayload } from '../../../shared/models/event-filter';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-list-event-data',
@@ -32,8 +33,14 @@ export class ListEventData {
   consumerService = inject(ConsumerService);
   authService = inject(AuthService);
   router = inject(Router);
+  private eRef = inject(ElementRef);
+  openMenuId = signal<string | null>(null);
+  private snackBar = inject(MatSnackBar); // <-- Add this inject
 
   protected readonly Math = Math;
+
+  eventToDelete = signal<{ id: string, title: string } | null>(null);
+  isDeleting = signal<boolean>(false);
 
   constructor() {
     this.consumerId.set(this.authService.getRoleScopedProfileId());
@@ -73,6 +80,64 @@ export class ListEventData {
   });
 
   totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.pageSize())));
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: Event) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.openMenuId.set(null);
+    }
+  }
+
+  toggleMenu(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.update(id => id === eventId ? null : eventId);
+  }
+
+  editEvent(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    this.router.navigate(['/consumer/events', eventId, 'edit']);
+  }
+
+  deleteEvent(event: Event, eventId: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    console.log('Delete event not yet implemented for:', eventId);
+  }
+
+  promptDeleteEvent(event: Event, eventId: string, eventTitle: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    this.eventToDelete.set({ id: eventId, title: eventTitle });
+  }
+
+  // <-- NEW: Close Modal
+  cancelDelete() {
+    this.eventToDelete.set(null);
+  }
+
+  // <-- NEW: Confirm Delete & Call API
+  confirmDelete() {
+    const target = this.eventToDelete();
+    if (!target) return;
+
+    this.isDeleting.set(true);
+    this.consumerService.deleteEvent(target.id)
+      .pipe(finalize(() => this.isDeleting.set(false)))
+      .subscribe({
+        next: () => {
+          this.snackBar.open(`Event deleted successfully`, 'Close', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top' });
+          this.eventToDelete.set(null);
+          // Refresh the current page of data
+          this.getEvents(this.tabStatus(), this.searchQuery(), this.activeFilters() ?? null);
+        },
+        error: (err) => {
+          console.error('Failed to delete event:', err);
+          this.snackBar.open('Failed to delete event. Please try again.', 'Close', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top' });
+          this.eventToDelete.set(null);
+        }
+      });
+  }
 
   setPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {

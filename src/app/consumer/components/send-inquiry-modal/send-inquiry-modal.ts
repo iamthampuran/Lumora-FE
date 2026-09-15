@@ -32,7 +32,7 @@ export class SendInquiryModal {
   inquirySubmitted = output<void>();
 
   // State
-  messageText = signal<string>('');
+  messageText = signal<string|null>(null);
   proposedAmount = signal<number | null>(null);
   isSubmitting = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
@@ -82,8 +82,8 @@ export class SendInquiryModal {
       eventId: this.eventId(),
       studioId: this.studioId(),
       consumerId: consumerId,
-      message: this.messageText().trim(),
-      quotedAmount: this.proposedAmount() ?? 0,
+      message: this.messageText() ?? null ? this.messageText()!.trim() : null,
+      quotedAmount: this.proposedAmount(),
     };
 
     this.consumerService
