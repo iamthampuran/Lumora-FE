@@ -119,4 +119,10 @@ export class ConsumerService {
     const url = `${this.baseUrl}/get-event-details-for-edit/${eventId}`;
     return this.baseService.get(url);
   }
+
+  deleteEvent(eventId: string): Observable<any> {
+    // Uses the base environment URL, not the consumer profile prefix, matching your swagger
+    const url = `${environment.apiUrl}/Event/${eventId}`;
+    return this.baseService.delete(url);
+  }
 }

@@ -48,7 +48,7 @@
               </button>
               <div class="h-px w-full bg-gray-50 my-0.5"></div>
               <button
-                (click)="deleteEvent($event, event.id)"
+                (click)="promptDeleteEvent($event, event.id, event.title)"
                 class="w-full text-left px-4 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
               >
                 Delete
@@ -477,3 +477,44 @@
     </div>
   </footer>
 </div>
+
+<!-- Delete Confirmation Modal -->
+@if (eventToDelete() !== null) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-fade-in">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-slide-up">
+      
+      <div class="p-6">
+        <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-600 mb-4">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Delete Event?</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          Are you sure you want to delete <strong>"{{ eventToDelete()?.title }}"</strong>? This action cannot be undone and any associated inquiries will be canceled.
+        </p>
+      </div>
+
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
+        <button 
+          (click)="cancelDelete()" 
+          [disabled]="isDeleting()"
+          class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50">
+          Cancel
+        </button>
+        <button 
+          (click)="confirmDelete()" 
+          [disabled]="isDeleting()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-50">
+          @if (isDeleting()) {
+            <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Deleting...
+          } @else {
+            Delete Event
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

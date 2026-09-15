@@ -2,6 +2,9 @@ import { Component, computed, ElementRef, HostListener, inject, input, output, s
 import { EventStatus } from '../../enums/event.status.enum';
 import { EventDetails } from '../../models/event-dashboard';
 import { Router } from '@angular/router';
+import { ConsumerService } from '../../services/consumer.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-event-tabs',
@@ -17,9 +20,45 @@ export class EventTabs {
 
   private router = inject(Router);
   private eRef = inject(ElementRef); // <-- Added for click-outside detection
+  private consumerService = inject(ConsumerService);
+  private snackBar = inject(MatSnackBar);
 
   // <-- NEW: State for dropdown menu
   openMenuId = signal<string | null>(null)
+  eventToDelete = signal<{ id: string, title: string } | null>(null);
+  isDeleting = signal<boolean>(false);
+
+  promptDeleteEvent(event: Event, eventId: string, eventTitle: string) {
+    event.stopPropagation();
+    this.openMenuId.set(null);
+    this.eventToDelete.set({ id: eventId, title: eventTitle });
+  }
+
+  cancelDelete() {
+    this.eventToDelete.set(null);
+  }
+
+  confirmDelete() {
+    const target = this.eventToDelete();
+    if (!target) return;
+
+    this.isDeleting.set(true);
+    this.consumerService.deleteEvent(target.id)
+      .pipe(finalize(() => this.isDeleting.set(false)))
+      .subscribe({
+        next: () => {
+          this.snackBar.open(`Event deleted successfully`, 'Close', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top' });
+          this.eventToDelete.set(null);
+          // The cleanest way to refresh the dashboard is to re-emit the active tab
+          this.statusChanged.emit(this.activeTab());
+        },
+        error: (err) => {
+          console.error('Failed to delete event:', err);
+          this.snackBar.open('Failed to delete event. Please try again.', 'Close', { duration: 4000, horizontalPosition: 'right', verticalPosition: 'top' });
+          this.eventToDelete.set(null);
+        }
+      });
+  }
 
  readonly mappedEvents = computed(() => {
     return this.actualEvents().slice(0, 3).map((event) => {
