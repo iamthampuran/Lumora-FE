@@ -265,4 +265,10 @@ export class AuthService {
     const url = `${environment.apiUrl}/Auth`;
     return this.baseService.get(url);
   }
+
+  // Add this new method
+  verify2FALogin(email: string, code: string): Observable<any> {
+    const url = `${environment.apiUrl}/Auth/2fa/verify-login`;
+    return this.baseService.post(url, { email, code });
+  }
 }
