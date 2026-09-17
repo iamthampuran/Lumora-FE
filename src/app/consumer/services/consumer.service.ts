@@ -125,4 +125,16 @@ export class ConsumerService {
     const url = `${environment.apiUrl}/Event/${eventId}`;
     return this.baseService.delete(url);
   }
+
+  updateProfilePicture(consumerId: string, file: File) : Observable<any> {
+    const url = `${this.baseUrl}/${consumerId}/update/profile/picture`;
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.baseService.patch(url, formData);
+  }
+
+  updateProfileDetails(updatedData: {fullName: string, phoneNumber: string | null, bio: string| null}): Observable<any> {
+    const url = `${this.baseUrl}/update/profile/information`;
+    return this.baseService.patch(url, updatedData);
+  }
 }
