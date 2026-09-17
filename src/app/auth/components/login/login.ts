@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -38,6 +38,12 @@ export class Login {
   // Signal to track password visibility
   showPassword = signal<boolean>(false);
 
+  // 2FA State
+  requires2FA = signal<boolean>(false);
+  otpDigits = signal<string[]>(['', '', '', '', '', '']);
+  
+  @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   // Method to toggle the signal value
   togglePasswordVisibility() {
     this.showPassword.update((val) => !val);
@@ -69,18 +75,79 @@ export class Login {
     this.isSubmitting.set(true);
 
     this.authService
-    .signInUser(email, password)
-    .pipe(finalize(() => this.isSubmitting.set(false)))
-    .subscribe({
-      next: (response) => {
-        this.authService.storeTokens(response.accessToken, response.refreshToken, rememberMe);
-        this.isLoginSuccess.set(true);
-        void this.router.navigate([this.authService.getRoleDashboardPath()]);
-      },
-      error: (error: unknown) => {
-        this.errorMessage.set(this.getErrorMessage(error));
-      },
-    });
+      .signInUser(email, password)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (response: any) => {
+          // Handle 2FA Requirement
+          if (response?.requires2FA) {
+            this.requires2FA.set(true);
+          } else {
+            // Standard login success
+            this.authService.storeTokens(response.accessToken, response.refreshToken, rememberMe);
+            this.isLoginSuccess.set(true);
+            void this.router.navigate([this.authService.getRoleDashboardPath()]);
+          }
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set(this.getErrorMessage(error));
+        },
+      });
+  }
+
+  onVerify2FASubmit() {
+    const code = this.otpDigits().join('');
+    if (code.length !== 6) return;
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
+
+    const email = this.loginForm.controls.email.value.trim().toLowerCase();
+    const rememberMe = this.loginForm.controls.rememberMe.value;
+
+    this.authService.verify2FALogin(email, code)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: (response: any) => {
+          this.authService.storeTokens(response?.accessToken, response?.refreshToken, rememberMe);
+          this.isLoginSuccess.set(true);
+          void this.router.navigate([this.authService.getRoleDashboardPath()]);
+        },
+        error: (error: unknown) => {
+          this.errorMessage.set('Invalid 2FA code. Please try again.');
+          this.otpDigits.set(['', '', '', '', '', '']);
+          const firstInput = this.otpInputs.first?.nativeElement;
+          firstInput?.focus();
+        }
+      });
+  }
+
+  onOtpInput(index: number, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const value = input.value.replace(/[^0-9]/g, ''); 
+    
+    const newDigits = [...this.otpDigits()];
+    newDigits[index] = value;
+    this.otpDigits.set(newDigits);
+
+    if (value && index < 5) {
+      const nextInput = this.otpInputs.toArray()[index + 1]?.nativeElement;
+      nextInput?.focus();
+    }
+  }
+
+  onOtpKeyDown(index: number, event: KeyboardEvent) {
+    if (event.key === 'Backspace' && !this.otpDigits()[index] && index > 0) {
+      const prevInput = this.otpInputs.toArray()[index - 1]?.nativeElement;
+      prevInput?.focus();
+    }
+  }
+
+  cancel2FA() {
+    this.requires2FA.set(false);
+    this.loginForm.controls.password.setValue('');
+    this.otpDigits.set(['', '', '', '', '', '']);
+    this.errorMessage.set(null);
   }
 
   private getErrorMessage(error: unknown): string {

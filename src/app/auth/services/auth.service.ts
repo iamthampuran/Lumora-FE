@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { CreateStudio } from '../models/create.studio';
 import { CreateConsumer } from '../models/create.consumer';
 import { SingInUser } from '../models/signin.user';
+import { CurrentUserResponse } from '../models/current-user-response';
 
 @Injectable({
   providedIn: 'root',
@@ -97,14 +98,14 @@ export class AuthService {
   }
 
   getRoleDashboardPath(): string {
-        const role = this.getRole();
-        if (role === UserRole.Cosnsumer) return '/consumer/dashboard';
-        if (role === UserRole.Studio) {
-            // console.log("Navigating to studio dashboard or setup based on profile completion ", this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup');
-            return this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup';
-        }
-        return '/login';
+    const role = this.getRole();
+    if (role === UserRole.Cosnsumer) return '/consumer/dashboard';
+    if (role === UserRole.Studio) {
+      // console.log("Navigating to studio dashboard or setup based on profile completion ", this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup');
+      return this.isProfileComplete() ? '/studio/dashboard' : '/studio/setup';
     }
+    return '/login';
+  }
 
   private getAccessToken(): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;
@@ -248,5 +249,26 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  initiate2Fa(password: string): Observable<{ secret: string; qrCodeUri: string }> {
+    const url = `${environment.apiUrl}/Auth/2fa/initiate`;
+    return this.baseService.post(url, { password });
+  }
+
+  verifyAndEnable2Fa(secret: string, code: string): Observable<string[]> {
+    const url = `${environment.apiUrl}/Auth/2fa/verify-and-enable`;
+    return this.baseService.post(url, { secret, code });
+  }
+
+  getCurrentUser(): Observable<CurrentUserResponse> {
+    const url = `${environment.apiUrl}/Auth`;
+    return this.baseService.get(url);
+  }
+
+  // Add this new method
+  verify2FALogin(email: string, code: string): Observable<any> {
+    const url = `${environment.apiUrl}/Auth/2fa/verify-login`;
+    return this.baseService.post(url, { email, code });
   }
 }
