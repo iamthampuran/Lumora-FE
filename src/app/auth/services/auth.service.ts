@@ -271,4 +271,9 @@ export class AuthService {
     const url = `${environment.apiUrl}/Auth/2fa/verify-login`;
     return this.baseService.post(url, { email, code });
   }
+
+  changePassword(payload: any): Observable<any> {
+  const url = `${environment.apiUrl}/Auth/change-password`; // Adjust to match your backend route
+  return this.baseService.patch(url, payload);
+}
 }

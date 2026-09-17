@@ -6,10 +6,11 @@ import { CurrentUserResponse } from '../../../auth/models/current-user-response'
 import { finalize } from 'rxjs';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { ProfileInformation } from '../profile-information/profile-information';
+import { ChangePassword } from '../../../auth/components/change-password/change-password';
 
 @Component({
   selector: 'app-settings',
-  imports: [CommonModule, TwoFactorWizard, LoaderComponent, ProfileInformation],
+  imports: [CommonModule, TwoFactorWizard, LoaderComponent, ProfileInformation, ChangePassword],
   templateUrl: './settings.html',
   styleUrl: './settings.css',
 })
