@@ -1,5 +1,4 @@
 import { Routes } from "@angular/router";
-import { StudioDetails } from "./pages/studio-details/studio-details";
 // import { ProfileSetup } from "./pages/profile-setup/profile-setup";
 import { profileCompletionGuard } from "../auth/guards/profile-completion.guard";
 import { studioSetupAccessGuard } from "../auth/guards/studio-setup-access.guard";

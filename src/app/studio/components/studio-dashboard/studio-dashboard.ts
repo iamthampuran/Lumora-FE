@@ -33,7 +33,7 @@ export class StudioDashboard implements OnInit {
   studioName = signal<string>('Studio');
 
   private readonly emptyStats: StudioDashboardStats = {
-    totalInquiries: 0,
+    inquiriesCount: 0,
     inquiriesGrowth: '0%',
     activeBookings: 0,
     pendingApprovals: 0,
@@ -72,17 +72,34 @@ export class StudioDashboard implements OnInit {
       });
   }
 
-  private normalizeDashboardSummary(data: StudioDashboardSummary | null | undefined): StudioDashboardSummary {
+private normalizeDashboardSummary(data: any): StudioDashboardSummary {
+    // Safely extract nested objects from the API response
+    const statsData = data?.statsData || {};
+    const ratingDetails = data?.ratingDetails || {};
+
     return {
       stats: {
-        ...this.emptyStats,
-        ...(data?.stats ?? {}),
+        // Map backend stats keys to frontend interface
+        inquiriesCount: statsData.inquiriesCount ?? this.emptyStats.inquiriesCount,
+        inquiriesGrowth: statsData.percentageIncrease !== undefined ? `${statsData.percentageIncrease}%` : this.emptyStats.inquiriesGrowth,
+        activeBookings: statsData.activeInquiriesCount ?? this.emptyStats.activeBookings,
+        pendingApprovals: statsData.pendingInquiriesCount ?? this.emptyStats.pendingApprovals,
+        totalRevenue: statsData.totalRevenueThisMonth ?? this.emptyStats.totalRevenue,
       },
+      
       inquiryDetails: data?.inquiryDetails ?? [],
-      pendingGalleries: data?.pendingGalleries ?? [],
+      
+      // Map 'galleryDetails' from backend to 'pendingGalleries' on frontend
+      pendingGalleries: data?.galleryDetails ?? [], 
+      
       reviewsSummary: {
         ...this.emptyReviews,
-        ...(data?.reviewsSummary ?? {}),
+        // Map 'ratingDetails' from backend to 'reviewsSummary' on frontend
+        averageRating: ratingDetails.averageRating ?? this.emptyReviews.averageRating,
+        totalReviews: ratingDetails.reviewCount ?? this.emptyReviews.totalReviews,
+        
+        // Note: You may need to map additional reviewerDetails fields here 
+        // depending on what the backend populates when a review exists.
       },
     };
   }
