@@ -21,7 +21,7 @@ export class StudioSidebar {
 
   ngOnInit() {
     this.studioName.set(this.authService.getUserDetailsFromToken('unique_name') || 'Studio');
-    this.profileUrl.set(this.authService.getUserDetailsFromToken('avatarUrl'));
+    this.profileUrl.set(this.authService.getUserDetailsFromToken('logoUrl'));
   }
 
   logoutUser(): void {

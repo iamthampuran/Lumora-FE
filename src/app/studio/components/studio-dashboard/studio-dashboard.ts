@@ -9,6 +9,7 @@ import { StudioService } from '../../services/studio.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { DashboardReviewSummary, DashboardStats as StudioDashboardStats, StudioDashboardSummary } from '../../models/studio-dashboard';
 import { finalize } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-studio-dashboard',
@@ -25,6 +26,8 @@ import { finalize } from 'rxjs';
 export class StudioDashboard implements OnInit {
   private studioService = inject(StudioService);
   private authService = inject(AuthService);
+  private router = inject(Router);
+
 
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
@@ -102,5 +105,9 @@ private normalizeDashboardSummary(data: any): StudioDashboardSummary {
         // depending on what the backend populates when a review exists.
       },
     };
+  }
+
+  navigateToInquiries() {
+    this.router.navigate(['/studio/inquiries']);
   }
 }
