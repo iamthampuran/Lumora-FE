@@ -1,0 +1,171 @@
+<div class="px-8 py-10 max-w-7xl mx-auto w-full relative h-full flex flex-col">
+  
+  <header class="mb-10 shrink-0">
+    <h1 class="text-3xl font-serif font-bold text-gray-900 mb-1">Inquiries</h1>
+    <p class="text-sm text-gray-500">Manage your incoming leads and respond to event requests.</p>
+  </header>
+
+  <div class="flex items-end justify-between border-b border-gray-200 mb-6 shrink-0">
+    <div class="flex gap-8 -mb-px">
+      <button (click)="setTab(inquiryTab.Submitted)" [attr.aria-selected]="activeTab() === inquiryTab.Submitted" 
+              class="pb-4 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer"
+              [ngClass]="activeTab() === inquiryTab.Submitted ? 'border-[#CF6B4E] text-[#CF6B4E]' : 'border-transparent text-gray-500 hover:text-gray-900'">
+        New 
+        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" 
+              [ngClass]="activeTab() === inquiryTab.Submitted ? 'bg-[#CF6B4E] text-white' : 'bg-gray-100 text-gray-600'">
+          {{ inquiriesData()?.newCount || 0 }}
+        </span>
+      </button>
+
+      <button (click)="setTab(inquiryTab.Accepted)" [attr.aria-selected]="activeTab() === inquiryTab.Accepted" 
+              class="pb-4 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer"
+              [ngClass]="activeTab() === inquiryTab.Accepted ? 'border-[#CF6B4E] text-[#CF6B4E]' : 'border-transparent text-gray-500 hover:text-gray-900'">
+        Accepted 
+        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" 
+              [ngClass]="activeTab() === inquiryTab.Accepted ? 'bg-[#CF6B4E] text-white' : 'bg-gray-100 text-gray-600'">
+          {{ inquiriesData()?.acceptedCount || 0 }}
+        </span>
+      </button>
+
+      <button (click)="setTab(inquiryTab.Confirmed)" [attr.aria-selected]="activeTab() === inquiryTab.Confirmed" 
+              class="pb-4 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer"
+              [ngClass]="activeTab() === inquiryTab.Confirmed ? 'border-[#CF6B4E] text-[#CF6B4E]' : 'border-transparent text-gray-500 hover:text-gray-900'">
+        Confirmed 
+        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" 
+              [ngClass]="activeTab() === inquiryTab.Confirmed ? 'bg-[#CF6B4E] text-white' : 'bg-gray-100 text-gray-600'">
+          {{ inquiriesData()?.confirmedCount || 0 }}
+        </span>
+      </button>
+
+      <button (click)="setTab(inquiryTab.Rejected)" [attr.aria-selected]="activeTab() === inquiryTab.Rejected" 
+              class="pb-4 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer"
+              [ngClass]="activeTab() === inquiryTab.Rejected ? 'border-[#CF6B4E] text-[#CF6B4E]' : 'border-transparent text-gray-500 hover:text-gray-900'">
+        Rejected 
+        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold" 
+              [ngClass]="activeTab() === inquiryTab.Rejected ? 'bg-[#CF6B4E] text-white' : 'bg-gray-100 text-gray-600'">
+          {{ inquiriesData()?.rejectedCount || 0 }}
+        </span>
+      </button>
+    </div>
+    
+    <button (click)="toggleFilter()" class="mb-4 flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"></path></svg>
+      Filters
+    </button>
+  </div>
+
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden flex-1 flex flex-col relative min-h-0">
+    <div class="overflow-x-auto flex-1">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-[#FAF8F5] border-b border-gray-100 sticky top-0 z-10">
+          <tr>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Client Name</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Event Type</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Event Title</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Event Date</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Location</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Quoted Amount</th>
+            <th class="px-6 py-4 text-xs font-bold text-gray-600 tracking-wider whitespace-nowrap">Received</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          @if (isLoading()) {
+            <tr>
+              <td colspan="7" class="py-12 text-center text-gray-500">
+                <div class="flex items-center justify-center gap-2">
+                  <svg class="animate-spin h-5 w-5 text-[#CF6B4E]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  Loading inquiries...
+                </div>
+              </td>
+            </tr>
+          } @else if (inquiriesData()?.inquiries?.data?.length === 0) {
+            <tr>
+              <td colspan="7" class="py-16 text-center">
+                <p class="text-sm font-bold text-gray-900 mb-1">No inquiries found</p>
+                <p class="text-xs text-gray-500">There are no inquiries to display.</p>
+              </td>
+            </tr>
+          } @else {
+            @for (inquiry of inquiriesData()?.inquiries?.data; track inquiry.inquiryId) {
+              <tr class="hover:bg-orange-50/30 transition-colors cursor-pointer group">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-[#FFF5F0] text-[#CF6B4E] flex items-center justify-center font-bold text-xs overflow-hidden shrink-0 border border-orange-100">
+                      @if (inquiry.clientAvatarUrl) {
+                        <img [src]="inquiry.clientAvatarUrl" alt="Avatar" class="w-full h-full object-cover">
+                      } @else {
+                        {{ inquiry.clientName.charAt(0) }}
+                      }
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900 group-hover:text-[#CF6B4E] transition-colors">{{ inquiry.clientName }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-3 py-1 rounded-full text-[11px] font-bold tracking-wider" [ngClass]="getEventTypeClasses(inquiry.eventType)">
+                    {{ inquiry.eventType }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-700 font-medium whitespace-nowrap">{{ inquiry.eventTitle }}</td>
+                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    {{ inquiry.eventDate | date:'MMM dd, yyyy' }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                  <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"></path></svg>
+                    <span class="truncate max-w-[120px]" [title]="inquiry.location">{{ inquiry.location }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm font-bold text-gray-900 whitespace-nowrap">
+                  {{ inquiry.quotedAmount ? (inquiry.quotedAmount | currency:'INR':'symbol':'1.0-0') : '-' }}
+                </td>
+                <td class="px-6 py-4 text-xs text-gray-500 font-medium whitespace-nowrap">{{ getRelativeTime(inquiry.receivedAt) }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer Pagination -->
+    <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-white shrink-0">
+      <p class="text-xs text-gray-500 font-medium">Showing page {{ currentPage() }} of {{ inquiriesData()?.inquiries?.totalPages || 1 }}</p>
+      <div class="flex gap-1">
+        <button (click)="setPage(currentPage() - 1)" [disabled]="currentPage() === 1" class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 cursor-pointer disabled:opacity-50">&lt;</button>
+        
+        @for (page of [].constructor(inquiriesData()?.inquiries?.totalPages || 1); track $index) {
+          <button (click)="setPage($index + 1)" 
+                  class="w-8 h-8 flex items-center justify-center rounded-md font-bold text-sm cursor-pointer transition-colors"
+                  [ngClass]="currentPage() === $index + 1 ? 'bg-orange-50 text-[#CF6B4E] border border-orange-100' : 'border border-gray-200 text-gray-700 hover:bg-gray-50'">
+            {{ $index + 1 }}
+          </button>
+        }
+        
+        <button (click)="setPage(currentPage() + 1)" [disabled]="currentPage() === (inquiriesData()?.inquiries?.totalPages || 1)" class="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md text-gray-500 hover:bg-gray-50 cursor-pointer disabled:opacity-50">&gt;</button>
+      </div>
+    </div>
+  </div>
+
+  @if (isFilterOpen()) {
+    <div class="absolute inset-0 bg-black/20 backdrop-blur-[1px] z-40" (click)="toggleFilter()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-80 bg-white shadow-2xl z-50 animate-slide-in-right flex flex-col border-l border-gray-100">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-[#FAF8F5]">
+        <h3 class="font-bold text-gray-900">Filters</h3>
+        <button (click)="toggleFilter()" class="text-gray-400 hover:text-gray-900 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="p-6 flex-1 overflow-y-auto space-y-6">
+        <p class="text-sm text-gray-500 italic">Filter implementation mapped to InquiryFilterPayload structure.</p>
+      </div>
+      <div class="p-6 border-t border-gray-100 flex gap-3">
+        <button (click)="clearFilters()" class="flex-1 py-2 text-sm font-bold text-[#CF6B4E] hover:underline cursor-pointer">Clear all</button>
+        <button (click)="toggleFilter()" class="flex-1 py-2.5 bg-[#CF6B4E] hover:bg-[#ba5b40] text-white rounded-xl text-sm font-bold shadow-sm transition-colors cursor-pointer">Apply Filters</button>
+      </div>
+    </div>
+  }
+</div>

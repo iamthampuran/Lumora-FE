@@ -5,6 +5,8 @@ import { StudioProfileModel, UpdateStudioTagsPayload } from '../models/studio-pr
 import { environment } from '../../../environments/environment';
 import { ProfileCompletionResult } from '../models/profile-completion';
 import { StudioDashboardSummary } from '../models/studio-dashboard';
+import { HttpParams } from '@angular/common/http';
+import { GetStudioInquiriesResponse, InquiryFilter } from '../models/studio-inquiry';
 
 @Service()
 export class StudioService {
@@ -78,5 +80,30 @@ export class StudioService {
     const url = `${this.baseUrl}/${studioId}/dashboard`;
     return this.baseService.get(url);
   }
+
+  getStudioInquiries(
+  status: number, 
+  pageCount: number, 
+  pageSize: number, 
+  filters?: InquiryFilter | null
+): Observable<GetStudioInquiriesResponse> {
+  const url = `${this.baseUrl}/inquiry-list/${status}`;
+  let params = new HttpParams()
+    .set('pageCount', pageCount.toString())
+    .set('pageSize', pageSize.toString());
+
+  if (filters) {
+    if (filters.eventTypes && filters.eventTypes.length > 0) {
+      filters.eventTypes.forEach(id => { params = params.append('EventTypeIds', id); });
+    }
+    if (filters.fromDate) params = params.set('StartDate', filters.fromDate.toDateString());
+    if (filters.toDate) params = params.set('EndDate', filters.toDate.toDateString());
+    if (filters.location) params = params.set('Location', filters.location);
+    if (filters.minAmount !== undefined && filters.minAmount !== null) params = params.set('MinAmount', filters.minAmount.toString());
+    if (filters.maxAmount !== undefined && filters.maxAmount !== null) params = params.set('MaxAmount', filters.maxAmount.toString());
+  }
+
+  return this.baseService.get(url, params);
+}
 
 }

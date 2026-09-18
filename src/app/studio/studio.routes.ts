@@ -5,6 +5,7 @@ import { studioSetupAccessGuard } from "../auth/guards/studio-setup-access.guard
 import { ProfileSetup } from "./components/profile-setup/profile-setup";
 import { StudioDashboard } from "./components/studio-dashboard/studio-dashboard";
 import { StudioLayout } from "./components/studio-layout/studio-layout";
+import { InquiriesList } from "./components/inquiries-list/inquiries-list";
 
 export const StudioRoutes: Routes = [
     {
@@ -28,7 +29,11 @@ export const StudioRoutes: Routes = [
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'
-            }
+            },
+            {
+                path: 'inquiries',
+                component: InquiriesList
+            },
         ]
     }
 ];
