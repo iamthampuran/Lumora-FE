@@ -8,8 +8,8 @@
           <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Inquiries</span>
         </div>
         <div>
-          <h3 class="text-3xl font-serif text-gray-900 mb-1">{{ stats().totalInquiries }}</h3>
-          @if (stats().totalInquiries === 0) {
+          <h3 class="text-3xl font-serif text-gray-900 mb-1">{{ stats().inquiriesCount }}</h3>
+          @if (stats().inquiriesCount === 0) {
             <p class="text-xs text-gray-500 font-medium">No inquiries received yet</p>
           } @else {
             <p class="text-xs text-green-600 font-medium flex items-center gap-1">

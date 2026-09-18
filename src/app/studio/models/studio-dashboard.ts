@@ -1,5 +1,5 @@
 export interface DashboardStats {
-  totalInquiries: number;
+  inquiriesCount: number;
   inquiriesGrowth: string;
   activeBookings: number;
   pendingApprovals: number;
