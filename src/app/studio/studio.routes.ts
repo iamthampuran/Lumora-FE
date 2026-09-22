@@ -1,39 +1,44 @@
-import { Routes } from "@angular/router";
+import { Routes } from '@angular/router';
 // import { ProfileSetup } from "./pages/profile-setup/profile-setup";
-import { profileCompletionGuard } from "../auth/guards/profile-completion.guard";
-import { studioSetupAccessGuard } from "../auth/guards/studio-setup-access.guard";
-import { ProfileSetup } from "./components/profile-setup/profile-setup";
-import { StudioDashboard } from "./components/studio-dashboard/studio-dashboard";
-import { StudioLayout } from "./components/studio-layout/studio-layout";
-import { InquiriesList } from "./components/inquiries-list/inquiries-list";
+import { profileCompletionGuard } from '../auth/guards/profile-completion.guard';
+import { studioSetupAccessGuard } from '../auth/guards/studio-setup-access.guard';
+import { ProfileSetup } from './components/profile-setup/profile-setup';
+import { StudioDashboard } from './components/studio-dashboard/studio-dashboard';
+import { StudioLayout } from './components/studio-layout/studio-layout';
+import { InquiriesList } from './components/inquiries-list/inquiries-list';
+import { InquiryDetails } from './components/inquiry-details/inquiry-details';
 
 export const StudioRoutes: Routes = [
-    {
-        // Setup gets no layout (full screen)
-        path: 'setup',
-        canActivate: [studioSetupAccessGuard],
-        component: ProfileSetup, 
-    },
-    {
-        // Everything inside here gets the sidebar
+  {
+    // Setup gets no layout (full screen)
+    path: 'setup',
+    canActivate: [studioSetupAccessGuard],
+    component: ProfileSetup,
+  },
+  {
+    // Everything inside here gets the sidebar
+    path: '',
+    component: StudioLayout,
+    canActivate: [profileCompletionGuard],
+    children: [
+      {
+        path: 'dashboard',
+        component: StudioDashboard,
+      },
+      // Note: Add Inquiries, Galleries, and Settings routes here as you build them
+      {
         path: '',
-        component: StudioLayout, 
-        canActivate: [profileCompletionGuard], 
-        children: [
-            {
-                path: 'dashboard',
-                component: StudioDashboard,
-            },
-            // Note: Add Inquiries, Galleries, and Settings routes here as you build them
-            {
-                path: '',
-                redirectTo: 'dashboard',
-                pathMatch: 'full'
-            },
-            {
-                path: 'inquiries',
-                component: InquiriesList
-            },
-        ]
-    }
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'inquiries',
+        component: InquiriesList,
+      },
+      {
+        path: 'inquiries/:inquiryId',
+        component: InquiryDetails,
+      },
+    ],
+  },
 ];

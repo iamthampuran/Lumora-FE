@@ -99,7 +99,7 @@
           </tr>
           } @else {
           @for (inquiry of inquiriesData()?.inquiries?.data; track inquiry.inquiryId) {
-          <tr class="hover:bg-orange-50/30 transition-colors cursor-pointer group">
+          <tr class="hover:bg-orange-50/30 transition-colors cursor-pointer group" (click)="viewDetails(inquiry.inquiryId)">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
                 <div

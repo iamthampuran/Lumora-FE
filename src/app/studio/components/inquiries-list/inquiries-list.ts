@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 import { InquiryStatus } from '../../enums/inquiry-status';
 import { LookupService } from '../../../shared/services/lookup.service';
 import { EventType } from '../../../shared/models/event-types';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inquiries-list',
@@ -19,6 +20,7 @@ export class InquiriesList implements OnInit {
   private studioService = inject(StudioService);
   private authService = inject(AuthService);
   private lookupService = inject(LookupService);
+  private router = inject(Router);
 
   activeTab = signal<InquiryStatus>(InquiryStatus.Submitted);
   isFilterOpen = signal<boolean>(false);
@@ -189,5 +191,9 @@ export class InquiriesList implements OnInit {
       },
       error: (err) => console.error('Error fetching event types', err)
     });
+  }
+
+  viewDetails(inquiryId: string){
+    this.router.navigate([`/studio/inquiries/${inquiryId}`]);
   }
 } 
