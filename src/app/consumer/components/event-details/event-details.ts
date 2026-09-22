@@ -1,13 +1,15 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { EventData } from '../../models/event-data';
 import { ConsumerService } from '../../services/consumer.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
+import { CommonModule } from '@angular/common';
+import { EventStatus } from '../../enums/event.status.enum';
 
 @Component({
   selector: 'app-event-details',
-  imports: [LoaderComponent],
+  imports: [LoaderComponent, CommonModule, RouterModule],
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })
@@ -18,6 +20,7 @@ export class EventDetails implements OnInit {
   consumerService = inject(ConsumerService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  eventStatusEnum = EventStatus;
 
   readonly eventInfo = computed(() => this.eventData()?.eventInformationDetails ?? null);
   readonly inquiryDetails = computed(() => this.eventData()?.inquiryDetails ?? []);
@@ -30,7 +33,6 @@ export class EventDetails implements OnInit {
     } else {
       this.isLoading.set(false);
       this.errorMessage.set('Event ID was not found in the URL.');
-      console.error('Event ID not found in route parameters.');
     }
   }
 
@@ -43,7 +45,6 @@ export class EventDetails implements OnInit {
     .subscribe({
       next: (data) => {
         this.eventData.set(data);
-
         if (!data?.eventInformationDetails) {
           this.errorMessage.set('Event details are unavailable for this event.');
         }
@@ -55,6 +56,7 @@ export class EventDetails implements OnInit {
     });
   }
 
+  // --- Helpers for Formatting ---
 
   formatEventDate(date: Date | string | null | undefined): string {
     if (!date) return '-';
@@ -83,42 +85,43 @@ export class EventDetails implements OnInit {
     });
   }
 
+  // Resolves the issue where tags come back as a Record<string, string> dictionary
+  getTagsArray(tags: any): string[] {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags;
+    if (typeof tags === 'object') return Object.values(tags);
+    return [];
+  }
+
+  // --- Inquiry Formatting (Matches Canva Exactly) ---
+
   getEventStatusLabel(): string {
     const hasAccepted = this.inquiryDetails().some((item) => item.inquiryStatus === 'accepted');
     if (hasAccepted) return 'Accepted';
     return 'Searching';
   }
 
-  getInquiryAgeLabel(date: Date | string): string {
+  getInquiryAgeLabel(date: Date | string, status: string): string {
     const parsed = new Date(date);
     if (isNaN(parsed.getTime())) return 'Updated recently';
 
     const diffMs = Math.max(0, Date.now() - parsed.getTime());
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    const action = status.toLowerCase() === 'accepted' ? 'Responded' : 'Sent';
 
-    if (days === 0) return 'Responded today';
-    if (days === 1) return 'Responded 1 day ago';
-    return `Responded ${days} days ago`;
+    if (days === 0) return `${action} today`;
+    if (days === 1) return `${action} 1 day ago`;
+    return `${action} ${days} days ago`;
   }
 
-  getInquiryBadgeClass(status: string): string {
-    return status === 'accepted'
-      ? 'bg-green-50 text-[#2a5940] border border-green-100'
-      : 'bg-orange-100/50 text-[#CF6B4E] border border-orange-100';
-  }
+  // --- Navigation Actions ---
 
-  getInquiryBadgeLabel(status: string): string {
-    return status === 'accepted' ? 'Accepted' : 'Pending Response';
-  }
-
-  getInquiryCardClass(status: string): string {
-    return status === 'accepted'
-      ? 'bg-white border border-gray-200 border-l-[3px] border-l-[#2a5940]'
-      : 'bg-[#FAF8F5] border border-transparent';
-  }
-
-  getInquiryLogoClass(status: string): string {
-    return status === 'accepted' ? 'bg-gray-900 text-white' : 'bg-[#ECE5DA] text-gray-600';
+  editEvent() {
+    const eventId = this.route.snapshot.paramMap.get('id');
+    if (eventId) {
+      this.router.navigate(['/consumer/events', eventId, 'edit']);
+    }
   }
 
   browseStudios() {
@@ -127,5 +130,4 @@ export class EventDetails implements OnInit {
       this.router.navigate(['/consumer/events', eventId, 'studios']);
     }
   }
-
 }
