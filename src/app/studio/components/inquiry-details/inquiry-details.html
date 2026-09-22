@@ -1,0 +1,798 @@
+<div class="min-h-screen bg-[#FDFBF9] font-sans text-gray-900 pb-16">
+  @if (isLoading()) {
+    <div class="flex items-center justify-center h-[80vh]">
+      <app-loader text="loading inquiry details"></app-loader>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="max-w-6xl mx-auto p-8">
+      <div
+        class="bg-red-50 text-red-600 p-5 rounded-2xl border border-red-100 text-sm font-medium flex items-center justify-between"
+      >
+        <span>{{ errorMessage() }}</span>
+        <button
+          (click)="goBack()"
+          class="px-4 py-2 bg-white border border-red-200 rounded-xl text-xs font-bold text-red-700 hover:bg-red-50 cursor-pointer"
+        >
+          Back to Inquiries
+        </button>
+      </div>
+    </div>
+  } @else if (inquiry(); as item) {
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <!-- Breadcrumb Navigation -->
+      <nav class="flex items-center gap-2 text-xs text-gray-500 font-medium mb-6">
+        <a routerLink="/studio/inquiries" class="hover:text-gray-900 transition-colors"
+          >Inquiries</a
+        >
+        <svg
+          class="w-3.5 h-3.5 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        <span class="text-gray-900 font-semibold">{{ item.event.title }}</span>
+      </nav>
+
+      <!-- Main Header Banner Card -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <h1 class="text-2xl sm:text-3xl font-serif font-bold text-gray-900">
+                {{ item.event.title }}
+              </h1>
+              <span
+                class="px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider border"
+                [ngClass]="statusBadge().class"
+              >
+                {{ statusBadge().label }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 font-medium">
+              {{ item.consumer.name }} &bull; Submitted {{ item.createdAt | date: 'mediumDate' }}
+            </p>
+          </div>
+
+          <button
+            (click)="goBack()"
+            class="self-start sm:self-auto px-4 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back
+          </button>
+        </div>
+
+        <!-- Metric Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100">
+          <div class="bg-[#FAF8F5] p-4 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1">
+              <svg
+                class="w-4 h-4 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Event Date
+            </div>
+            <p class="text-sm font-bold text-gray-900">
+              {{ item.event.date | date: 'MMM dd, yyyy' }}
+            </p>
+          </div>
+
+          <div class="bg-[#FAF8F5] p-4 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1">
+              <svg
+                class="w-4 h-4 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                />
+              </svg>
+              Location
+            </div>
+            <p class="text-sm font-bold text-gray-900 truncate" [title]="item.event.location">
+              {{ item.event.location }}
+            </p>
+          </div>
+
+          <div class="bg-[#FAF8F5] p-4 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1">
+              <svg
+                class="w-4 h-4 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Duration
+            </div>
+            <p class="text-sm font-bold text-gray-900">{{ item.event.duration }} Hours</p>
+          </div>
+
+          <div class="bg-[#FAF8F5] p-4 rounded-xl border border-gray-100">
+            <div class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1">
+              <svg
+                class="w-4 h-4 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="1.8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"
+                />
+              </svg>
+              Budget
+            </div>
+            <p class="text-sm font-bold text-gray-900">
+              {{ item.event.budget | currency: 'INR' : 'symbol' : '1.0-0' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Layout Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left Content Area (8 Cols) -->
+        <div class="lg:col-span-8 space-y-8">
+          <!-- Event Details / Special Requirements -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
+            <h3 class="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <svg
+                class="w-5 h-5 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                />
+              </svg>
+              Event Details
+            </h3>
+
+            <div class="space-y-4 text-sm">
+              <div class="grid grid-cols-3 py-2 border-b border-gray-50">
+                <span class="text-xs font-bold text-gray-500 uppercase">Event Type</span>
+                <span class="col-span-2 font-semibold text-gray-900">{{
+                  item.event.category
+                }}</span>
+              </div>
+              <div class="grid grid-cols-3 py-2 border-b border-gray-50">
+                <span class="text-xs font-bold text-gray-500 uppercase">Event Title</span>
+                <span class="col-span-2 font-semibold text-gray-900">{{ item.event.title }}</span>
+              </div>
+              <div class="grid grid-cols-3 py-2">
+                <span class="text-xs font-bold text-gray-500 uppercase">Special Requirements</span>
+                <div class="col-span-2">
+                  @if (item.event.specialRequirements) {
+                    <blockquote
+                      class="pl-4 border-l-2 border-[#CF6B4E] italic text-gray-700 text-xs leading-relaxed bg-[#FFF8F5] p-3 rounded-r-xl"
+                    >
+                      "{{ item.event.specialRequirements }}"
+                    </blockquote>
+                  } @else {
+                    <span class="text-gray-400 italic text-xs"
+                      >&mdash; No additional requirements mentioned.</span
+                    >
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Tags/Styles -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
+            <h3 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg
+                class="w-5 h-5 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
+                />
+              </svg>
+              Selected Styles
+            </h3>
+            <div class="flex flex-wrap gap-2.5">
+              @for (tag of item.event.tags; track tag) {
+                <span
+                  class="px-3.5 py-1.5 bg-[#FFF5F0] text-[#CF6B4E] border border-orange-100 rounded-xl text-xs font-bold"
+                >
+                  #{{ tag }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- Team Assignment Section (For Confirmed / Paid Statuses) -->
+          @if (item.status === 'Confirmed' || item.status === 'Accepted') {
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8">
+              <div class="flex justify-between items-center mb-6">
+                <div>
+                  <h3 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                    <svg
+                      class="w-5 h-5 text-[#CF6B4E]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+                      />
+                    </svg>
+                    Team Assignment
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    Assign studio professionals to this event.
+                  </p>
+                </div>
+                <button
+                  (click)="openAssignModal()"
+                  class="px-4 py-2 border border-[#CF6B4E] text-[#CF6B4E] hover:bg-orange-50 text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z"
+                    />
+                  </svg>
+                  Assign Member
+                </button>
+              </div>
+
+              @if (!item.teamAssignments || item.teamAssignments.length === 0) {
+                <div
+                  class="border border-dashed border-gray-200 rounded-xl p-8 text-center bg-[#FAF8F5]"
+                >
+                  <div
+                    class="w-10 h-10 mx-auto rounded-full bg-orange-50 text-[#CF6B4E] flex items-center justify-center mb-3"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197M6 18.719A5.971 5.971 0 016.941 15.52m0 0A5.998 5.971 0 0012 12.75a5.998 5.998 0 005.059 2.77"
+                      />
+                    </svg>
+                  </div>
+                  <p class="text-xs font-bold text-gray-900 mb-1">No team members assigned yet.</p>
+                  <p class="text-[11px] text-gray-500">
+                    Add photographers, editors, or coordinators to this event.
+                  </p>
+                </div>
+              } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  @for (member of item.teamAssignments; track member.id) {
+                    <div
+                      class="flex items-center gap-3 p-3 border border-gray-100 rounded-xl bg-white shadow-2xs"
+                    >
+                      <img
+                        [src]="
+                          member.avatarUrl ||
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150'
+                        "
+                        class="w-10 h-10 rounded-full object-cover shrink-0"
+                        [alt]="member.name"
+                      />
+                      <div class="min-w-0 flex-1">
+                        <p class="text-xs font-bold text-gray-900 truncate">{{ member.name }}</p>
+                        <p class="text-[11px] text-[#CF6B4E] font-medium">{{ member.role }}</p>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Right Sidebar Area (4 Cols) -->
+        <div class="lg:col-span-4 space-y-8">
+          <!-- Payment Summary Card (When Accepted/Confirmed/Paid) -->
+          @if (item.payment || item.status === 'Accepted' || item.status === 'Confirmed') {
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <h3 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg
+                  class="w-4 h-4 text-[#CF6B4E]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
+                  />
+                </svg>
+                Payment Summary
+              </h3>
+
+              <div class="space-y-3 text-xs mb-4">
+                <div class="flex justify-between text-gray-600">
+                  <span>Service Fee</span>
+                  <span class="font-semibold text-gray-900">{{
+                    item.payment?.serviceFee || item.quotedAmount
+                      | currency: 'INR' : 'symbol' : '1.0-0'
+                  }}</span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                  <span>Platform Fee (5%)</span>
+                  <span class="font-semibold text-gray-900">{{
+                    item.payment?.platformFee || item.quotedAmount * 0.05
+                      | currency: 'INR' : 'symbol' : '1.0-0'
+                  }}</span>
+                </div>
+                <div
+                  class="flex justify-between pt-3 border-t border-gray-100 text-sm font-bold text-gray-900"
+                >
+                  <span>Total</span>
+                  <span class="text-[#CF6B4E]">{{
+                    item.payment?.totalPaid || item.quotedAmount * 1.05
+                      | currency: 'INR' : 'symbol' : '1.0-0'
+                  }}</span>
+                </div>
+              </div>
+
+              <!-- Transaction Status Badge -->
+              <div class="p-3 bg-[#FAF8F5] rounded-xl border border-gray-100 text-xs mb-4">
+                <div class="flex items-center gap-2 mb-1">
+                  @if (item.status === 'Confirmed') {
+                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span class="font-bold text-emerald-800">Payment Confirmed</span>
+                  } @else {
+                    <svg
+                      class="w-4 h-4 text-amber-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span class="font-bold text-amber-800">Awaiting Payment</span>
+                  }
+                </div>
+                <p class="text-[11px] text-gray-500">
+                  {{
+                    item.payment?.paidAt
+                      ? 'Paid on ' + (item.payment?.paidAt | date: 'medium')
+                      : 'Client is completing transaction via UPI'
+                  }}
+                </p>
+                @if (item.payment?.transactionId) {
+                  <p class="text-[10px] font-mono text-gray-400 mt-1">
+                    TXN: {{ item.payment?.transactionId }}
+                  </p>
+                }
+              </div>
+
+              @if (item.status === 'Confirmed') {
+                <button
+                  (click)="downloadReceipt()"
+                  class="w-full py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-semibold rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+                >
+                  <svg
+                    class="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                    />
+                  </svg>
+                  Download Receipt
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Contact Information & Consumer Profile -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <svg
+                class="w-4 h-4 text-[#CF6B4E]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                />
+              </svg>
+              Contact Information
+            </h3>
+
+            <!-- Email & Phone Copy Inputs -->
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1"
+                  >Email</label
+                >
+                <div
+                  class="flex items-center justify-between bg-[#FAF8F5] px-3 py-2 rounded-xl border border-gray-100"
+                >
+                  <span class="text-xs font-semibold text-gray-800 truncate mr-2">{{
+                    item.consumer.email
+                  }}</span>
+                  <button
+                    (click)="copyContact(item.consumer.email, 'Email')"
+                    class="text-gray-400 hover:text-[#CF6B4E] cursor-pointer"
+                    title="Copy Email"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1"
+                  >Phone Number</label
+                >
+                <div
+                  class="flex items-center justify-between bg-[#FAF8F5] px-3 py-2 rounded-xl border border-gray-100"
+                >
+                  <span class="text-xs font-semibold text-gray-800">{{ item.consumer.phone }}</span>
+                  <button
+                    (click)="copyContact(item.consumer.phone, 'Phone')"
+                    class="text-gray-400 hover:text-[#CF6B4E] cursor-pointer"
+                    title="Copy Phone"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <hr class="border-gray-100" />
+
+            <!-- Consumer Profile Card -->
+            <div class="text-center pt-2">
+              <div
+                class="w-16 h-16 rounded-full bg-[#FFF5F0] text-[#CF6B4E] font-bold font-serif text-xl flex items-center justify-center mx-auto mb-3 border border-orange-100 shadow-2xs"
+              >
+                {{ item.consumer.name.charAt(0) }}
+              </div>
+              <h4 class="font-bold text-gray-900 text-sm">{{ item.consumer.name }}</h4>
+              <p class="text-xs text-gray-500 mt-0.5">
+                {{ item.consumer.tierStatus }} &bull; {{ item.event.location }}
+              </p>
+
+              <div class="grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-gray-100 text-xs">
+                <div>
+                  <p class="text-base font-bold text-gray-900">{{ item.consumer.priorBookings }}</p>
+                  <p class="text-[10px] text-gray-400 uppercase font-semibold">Prior Bookings</p>
+                </div>
+                <div>
+                  <p class="text-base font-bold text-[#CF6B4E]">{{ item.consumer.tierStatus }}</p>
+                  <p class="text-[10px] text-gray-400 uppercase font-semibold">Tier Status</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky / Fixed Bottom Action Bar for New Inquiries -->
+      @if (item.status === 'Submitted') {
+        <div
+          class="mt-10 bg-white border border-gray-200 rounded-2xl shadow-lg p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div
+            class="flex items-center gap-3 text-xs text-amber-800 bg-amber-50 px-4 py-2.5 rounded-xl border border-amber-200/60 w-full sm:w-auto"
+          >
+            <svg
+              class="w-5 h-5 text-amber-600 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+              />
+            </svg>
+            <span
+              >Reviewing this inquiry will expire the offer to other photographers in 24
+              hours.</span
+            >
+          </div>
+
+          <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <button
+              (click)="declineInquiry()"
+              [disabled]="isActionLoading()"
+              class="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer shadow-2xs"
+            >
+              &times; Decline Inquiry
+            </button>
+            <button
+              (click)="acceptInquiry()"
+              [disabled]="isActionLoading()"
+              class="px-7 py-2.5 bg-[#CF6B4E] hover:bg-[#ba5b40] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-sm flex items-center gap-2"
+            >
+              @if (isActionLoading()) {
+                <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                    fill="none"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              } @else {
+                &#10003; Accept Inquiry
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Assign Team Members Modal Overlay -->
+@if (isAssignModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div
+      class="absolute inset-0 bg-black/40 backdrop-blur-[2px] animate-fade-in"
+      (click)="closeAssignModal()"
+    ></div>
+
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-slide-up flex flex-col max-h-[85vh]"
+    >
+      <!-- Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-100">
+        <div>
+          <h3 class="text-lg font-serif font-bold text-gray-900">Assign Team Members</h3>
+          <p class="text-xs text-gray-500 mt-0.5">
+            Select professionals and assign their roles for this event.
+          </p>
+        </div>
+        <button
+          (click)="closeAssignModal()"
+          class="text-gray-400 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100 transition-colors"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 overflow-y-auto space-y-4">
+        <!-- Search Bar -->
+        <div class="relative">
+          <svg
+            class="w-4 h-4 text-gray-400 absolute left-3.5 top-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            [value]="teamSearchQuery()"
+            (input)="teamSearchQuery.set($any($event.target).value)"
+            placeholder="Search by name or specialty..."
+            class="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-xl outline-none focus:border-[#CF6B4E] focus:ring-1 focus:ring-[#CF6B4E]"
+          />
+        </div>
+
+        <!-- Professionals List -->
+        <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          @for (prof of filteredProfessionals(); track prof.id) {
+            <div
+              (click)="toggleTeamMember(prof.id)"
+              [ngClass]="
+                isMemberSelected(prof.id)
+                  ? 'border-[#CF6B4E] bg-[#FFF5F0]'
+                  : 'border-gray-100 bg-white hover:border-gray-200'
+              "
+              class="flex items-center justify-between p-3 border rounded-xl cursor-pointer transition-all select-none"
+            >
+              <div class="flex items-center gap-3">
+                <img
+                  [src]="prof.avatarUrl"
+                  [alt]="prof.name"
+                  class="w-9 h-9 rounded-full object-cover"
+                />
+                <div>
+                  <p class="text-xs font-bold text-gray-900">{{ prof.name }}</p>
+                  <p class="text-[11px] text-gray-500">
+                    {{ prof.role }} &bull; {{ prof.location }}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="w-5 h-5 rounded-md border flex items-center justify-center transition-colors"
+                [ngClass]="
+                  isMemberSelected(prof.id)
+                    ? 'bg-[#CF6B4E] border-[#CF6B4E] text-white'
+                    : 'border-gray-300 bg-white'
+                "
+              >
+                @if (isMemberSelected(prof.id)) {
+                  <svg
+                    class="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    stroke-width="3"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4.5 12.75l6 6 9-13.5"
+                    />
+                  </svg>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Optional Notes -->
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1"
+            >Assignment Notes (Optional)</label
+          >
+          <textarea
+            rows="3"
+            [value]="assignmentNotes()"
+            (input)="assignmentNotes.set($any($event.target).value)"
+            placeholder="Instructions for the team member..."
+            class="w-full px-3 py-2 text-xs border border-gray-200 rounded-xl outline-none focus:border-[#CF6B4E] resize-none"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 sm:px-6 border-t border-gray-100 bg-[#FAF8F5] flex justify-end gap-3">
+        <button
+          (click)="closeAssignModal()"
+          class="px-5 py-2 border border-gray-200 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="confirmTeamAssignments()"
+          [disabled]="selectedTeamMemberIds().length === 0"
+          class="px-6 py-2 bg-[#CF6B4E] hover:bg-[#ba5b40] text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50 shadow-sm"
+        >
+          Confirm Assignments
+        </button>
+      </div>
+    </div>
+  </div>
+}

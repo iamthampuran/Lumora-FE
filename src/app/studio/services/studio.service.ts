@@ -7,6 +7,8 @@ import { ProfileCompletionResult } from '../models/profile-completion';
 import { StudioDashboardSummary } from '../models/studio-dashboard';
 import { HttpParams } from '@angular/common/http';
 import { GetStudioInquiriesResponse, InquiryFilter } from '../models/studio-inquiry';
+import { InquiryDetail } from '../../consumer/models/event-data';
+import { InquiryData } from '../models/inquiry-details';
 
 @Service()
 export class StudioService {
@@ -104,6 +106,11 @@ export class StudioService {
   }
 
   return this.baseService.get(url, params);
+}
+
+getInquiryDetails(inquiryId: string): Observable<InquiryData> {
+  const url = `${this.baseUrl}/inquiries/${inquiryId}`;
+  return this.baseService.get(url);
 }
 
 }
