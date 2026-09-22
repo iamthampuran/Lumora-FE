@@ -113,4 +113,9 @@ getInquiryDetails(inquiryId: string): Observable<InquiryData> {
   return this.baseService.get(url);
 }
 
+respondToInquiry(inquiryId: string, isAccepted: boolean, rejectedMessage?: string | null): Observable<any> {
+  const url = `${this.baseUrl}/inquiries/${inquiryId}/respond`;
+  return this.baseService.patch(url, { isAccepted: isAccepted, inquiryId: inquiryId, rejectedMessage: rejectedMessage });
+}
+
 }
