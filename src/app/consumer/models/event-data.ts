@@ -1,3 +1,5 @@
+import { EventStatus } from "../enums/event.status.enum";
+
 export interface EventData{
     inquiryDetails: InquiryDetail[];
     eventInformationDetails: EventInformationDetails;
@@ -24,7 +26,8 @@ export interface EventInformationDetails{
         latitude: number;
         longitude: number;
         locationName: string
-    }
+    },
+    status: EventStatus
 }
 
 export interface EventEditDetails {

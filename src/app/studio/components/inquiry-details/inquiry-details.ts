@@ -33,6 +33,9 @@ export class InquiryDetails implements OnInit {
   teamSearchQuery = signal<string>('');
   assignmentNotes = signal<string>('');
   selectedTeamMemberIds = signal<string[]>([]);
+  isAcceptModalOpen = signal<boolean>(false);
+  isDeclineModalOpen = signal<boolean>(false);
+  declineReason = signal<string>('');
 
   // Available professionals list mock for assignment modal
   availableProfessionals = signal<TeamMember[]>([
@@ -95,39 +98,11 @@ export class InquiryDetails implements OnInit {
   }
 
   acceptInquiry(): void {
-  //   const id = this.inquiryId();
-  //   if (!id) return;
-
-  //   this.isActionLoading.set(true);
-  //   this.studioService.acceptInquiry(id)
-  //     .pipe(finalize(() => this.isActionLoading.set(false)))
-  //     .subscribe({
-  //       next: () => {
-  //         this.snackBar.open('Inquiry accepted successfully!', 'Close', { duration: 3000 });
-  //         this.fetchInquiryDetails(id);
-  //       },
-  //       error: (err) => {
-  //         this.snackBar.open(err.error?.message || 'Failed to accept inquiry.', 'Close', { duration: 3000 });
-  //       }
-  //     });
+    this.processInquiryResponse(true);
   }
 
   declineInquiry(): void {
-  //   const id = this.inquiryId();
-  //   if (!id) return;
-
-  //   this.isActionLoading.set(true);
-  //   this.studioService.declineInquiry(id)
-  //     .pipe(finalize(() => this.isActionLoading.set(false)))
-  //     .subscribe({
-  //       next: () => {
-  //         this.snackBar.open('Inquiry declined.', 'Close', { duration: 3000 });
-  //         this.fetchInquiryDetails(id);
-  //       },
-  //       error: (err) => {
-  //         this.snackBar.open(err.error?.message || 'Failed to decline inquiry.', 'Close', { duration: 3000 });
-  //       }
-  //     });
+    this.processInquiryResponse(false);
   }
 
   // // --- Team Member Assignment Modal ---
@@ -179,6 +154,30 @@ export class InquiryDetails implements OnInit {
   //     });
   }
 
+  private processInquiryResponse(isAccepted: boolean, rejectedMessage?: string | null): void {
+  const id = this.inquiryId();
+  if (!id) return;
+
+  this.isActionLoading.set(true);
+  
+  // Make sure your StudioService has the respondToInquiry method implemented
+  this.studioService.respondToInquiry(id, isAccepted, rejectedMessage)
+    .pipe(finalize(() => {
+      this.isActionLoading.set(false);
+      if (isAccepted) this.closeAcceptModal();
+      else this.closeDeclineModal();
+    }))
+    .subscribe({
+      next: () => {
+        this.snackBar.open(isAccepted ? 'Inquiry accepted!' : 'Inquiry declined.', 'Close', { duration: 3000 });
+        this.fetchInquiryDetails(id);
+      },
+      error: (err) => {
+        this.snackBar.open(err.error?.message || 'Failed to update inquiry.', 'Close', { duration: 3000 });
+      }
+    });
+}
+
   downloadReceipt(): void {
     this.snackBar.open('Downloading payment receipt...', 'Close', { duration: 2500 });
   }
@@ -191,4 +190,31 @@ export class InquiryDetails implements OnInit {
   goBack(): void {
     this.router.navigate(['/studio/inquiries']);
   }
+
+  openAcceptModal(): void {
+  this.isAcceptModalOpen.set(true);
+}
+
+closeAcceptModal(): void {
+  this.isAcceptModalOpen.set(false);
+}
+
+openDeclineModal(): void {
+  this.declineReason.set(''); // Reset reason
+  this.isDeclineModalOpen.set(true);
+}
+
+closeDeclineModal(): void {
+  this.isDeclineModalOpen.set(false);
+}
+
+// --- Action Executions ---
+confirmAccept(): void {
+  this.processInquiryResponse(true);
+}
+
+confirmDecline(): void {
+  const reason = this.declineReason().trim();
+  this.processInquiryResponse(false, reason.length > 0 ? reason : null);
+}
 }
