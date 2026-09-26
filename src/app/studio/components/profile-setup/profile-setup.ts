@@ -11,10 +11,11 @@ import { UploadCover } from '../upload-cover/upload-cover';
 import { UploadPortfolio } from '../upload-portfolio/upload-portfolio';
 import { ManageTags } from '../manage-tags/manage-tags';
 import { ManageTeams } from '../manage-teams/manage-teams';
+import { UpdatePayment } from '../update-payment/update-payment';
 
 @Component({
   selector: 'app-profile-setup',
-  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover, UploadPortfolio, ManageTags, ManageTeams],
+  imports: [CommonModule, LoaderComponent, UploadLogo, UploadCover, UploadPortfolio, ManageTags, ManageTeams, UpdatePayment],
   templateUrl: './profile-setup.html',
   styleUrl: './profile-setup.css',
 })
@@ -62,8 +63,9 @@ goToSettings(step: ProfileCompletionStep) {
     else if (step.title.includes('Cover')) this.activeModal.set('Cover');
     else if (step.title.includes('Photos')) this.activeModal.set('Photos');
     else if (step.title.includes('Styles')) this.activeModal.set('Styles');
-    else if (step.title.includes('Team')) this.activeModal.set('Team'); // Add This Map
-    else this.router.navigate(['/studio/settings']); 
+    else if (step.title.includes('Team')) this.activeModal.set('Team');
+    else if (step.title.includes('Payment')) this.activeModal.set('Payment'); // <-- 3. Map Step
+    else this.router.navigate(['/studio/settings']);
   }
 
   logoutUser(): void {
@@ -84,6 +86,7 @@ goToSettings(step: ProfileCompletionStep) {
     if (stepName.includes('Photos')) return 'Add Photos';
     if (stepName.includes('Styles')) return 'Add Styles';
     if (stepName.includes('Team')) return 'Add Team';
+    if (stepName.includes('Payment')) return 'Set Payment Method'; // <-- 4. Set Action Text
     if (stepName.includes('Service Area')) return 'Set Service Area';
     if (stepName.includes('Verify')) return 'Verify Now';
     return 'Complete Step';
@@ -111,6 +114,11 @@ goToSettings(step: ProfileCompletionStep) {
 
   // Add the refresh handler
   onTeamUpdated() {
+    this.activeModal.set(null);
+    this.loadProfileCompletionStatus();
+  }
+  
+  onPaymentUpdated() {
     this.activeModal.set(null);
     this.loadProfileCompletionStatus();
   }
