@@ -1,7 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { BaseService } from '../../shared/services/base.service';
 import { Observable } from 'rxjs';
-import { StudioProfileModel, UpdateStudioTagsPayload } from '../models/studio-profile-model';
+import { PortfolioDetails, StudioProfileModel, UpdateStudioTagsPayload } from '../models/studio-profile-model';
 import { environment } from '../../../environments/environment';
 import { ProfileCompletionResult } from '../models/profile-completion';
 import { StudioDashboardSummary } from '../models/studio-dashboard';
@@ -130,6 +130,11 @@ updatePaymentInformation(upiId: string | null, qrCodeFile: File | null): Observa
   }
 
   return this.baseService.patch(`${this.baseUrl}/payment-information`, formData);
+}
+
+getProfileImages(): Observable<PortfolioDetails[]> {
+  const url = `${this.baseUrl}/profile-images`;
+  return this.baseService.get(url);
 }
 
 }

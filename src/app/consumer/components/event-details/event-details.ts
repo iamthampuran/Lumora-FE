@@ -44,20 +44,21 @@ export class EventDetails implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.consumerService.getEventDetails(eventId)
-    .pipe(finalize(() => this.isLoading.set(false)))
-    .subscribe({
-      next: (data) => {
-        this.eventData.set(data);
-        if (!data?.eventInformationDetails) {
-          this.errorMessage.set('Event details are unavailable for this event.');
-        }
-      },
-      error: (error) => {
-        this.errorMessage.set('Unable to load event details right now. Please try again.');
-        console.error('Error fetching event details:', error);
-      },
-    });
+    this.consumerService
+      .getEventDetails(eventId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (data) => {
+          this.eventData.set(data);
+          if (!data?.eventInformationDetails) {
+            this.errorMessage.set('Event details are unavailable for this event.');
+          }
+        },
+        error: (error) => {
+          this.errorMessage.set('Unable to load event details right now. Please try again.');
+          console.error('Error fetching event details:', error);
+        },
+      });
   }
 
   // --- Helpers for Formatting ---
@@ -99,27 +100,73 @@ export class EventDetails implements OnInit {
 
   // --- Inquiry Formatting (Matches Canva Exactly) ---
 
-getEventStatusLabel(): string {
-    const statuses = this.inquiryDetails().map(item => item.inquiryStatus?.toLowerCase());
-    if (statuses.includes('confirmed')) return 'Confirmed';
-    if (statuses.includes('accepted')) return 'Accepted';
+  getEventStatusLabel(): string {
+    const statuses = this.inquiryDetails()
+      .map((item) => item.inquiryStatus?.toLowerCase())
+      .filter(Boolean);
+
+    if (statuses.includes('confirmed')) {
+      return 'Confirmed';
+    }
+
+    if (statuses.includes('accepted')) {
+      return 'Accepted';
+    }
+
+    if (statuses.includes('submitted')) {
+      return 'Searching';
+    }
+
+    if (statuses.length > 0 && statuses.every((status) => status === 'rejected')) {
+      return 'No Studio Accepted';
+    }
+
+    if (statuses.length > 0 && statuses.every((status) => status === 'cancelled')) {
+      return 'Cancelled';
+    }
+
+    if (
+      statuses.length > 0 &&
+      statuses.every((status) => status === 'rejected' || status === 'cancelled')
+    ) {
+      return 'No Active Inquiries';
+    }
+
     return 'Searching';
   }
 
-
   getInquiryAgeLabel(date: Date | string, status: string): string {
     const parsed = new Date(date);
-    if (isNaN(parsed.getTime())) return 'Updated recently';
+    if (isNaN(parsed.getTime())) {
+      return 'Updated recently';
+    }
     const diffMs = Math.max(0, Date.now() - parsed.getTime());
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
     const lowerStatus = status?.toLowerCase();
     let action = 'Sent';
-    if (lowerStatus === 'accepted') action = 'Responded';
-    if (lowerStatus === 'confirmed') action = 'Confirmed';
-
-    if (days === 0) return `${action} today`;
-    if (days === 1) return `${action} 1 day ago`;
+    switch (lowerStatus) {
+      case 'submitted':
+        action = 'Sent';
+        break;
+      case 'accepted':
+        action = 'Responded';
+        break;
+      case 'confirmed':
+        action = 'Confirmed';
+        break;
+      case 'rejected':
+        action = 'Declined';
+        break;
+      case 'cancelled':
+        action = 'Cancelled';
+        break;
+    }
+    if (days === 0) {
+      return `${action} today`;
+    }
+    if (days === 1) {
+      return `${action} 1 day ago`;
+    }
     return `${action} ${days} days ago`;
   }
 
@@ -148,7 +195,7 @@ getEventStatusLabel(): string {
     this.isPaymentModalOpen.set(false);
   }
 
-onPaymentSuccess(): void {
+  onPaymentSuccess(): void {
     // Refresh the event details to reflect the new "Paid" status
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
