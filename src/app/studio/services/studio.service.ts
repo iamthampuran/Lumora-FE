@@ -118,4 +118,18 @@ respondToInquiry(inquiryId: string, isAccepted: boolean, rejectedMessage?: strin
   return this.baseService.patch(url, { isAccepted: isAccepted, inquiryId: inquiryId, rejectedMessage: rejectedMessage });
 }
 
+updatePaymentInformation(upiId: string | null, qrCodeFile: File | null): Observable<any> {
+  const formData = new FormData();
+  
+  // Append values if they exist based on the Swagger spec
+  if (upiId) {
+    formData.append('upiId', upiId);
+  }
+  if (qrCodeFile) {
+    formData.append('file', qrCodeFile);
+  }
+
+  return this.baseService.patch(`${this.baseUrl}/payment-information`, formData);
+}
+
 }
