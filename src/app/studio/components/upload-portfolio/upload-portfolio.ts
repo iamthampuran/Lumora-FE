@@ -48,12 +48,12 @@ export class UploadPortfolio implements OnInit {
 
     this.isLoading.set(true);
     this.studioService
-      .getStudioDetails(studioId)
+      .getProfileImages()
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (res) => {
           // Sort items by order so they appear correctly
-          const sorted = (res.portfolioDetails || []).sort((a, b) => a.displayOrder - b.displayOrder);
+          const sorted = (res|| []).sort((a, b) => a.displayOrder - b.displayOrder);
           this.portfolioItems.set(sorted);
         },
         error: () => console.error('Failed to fetch portfolio'),

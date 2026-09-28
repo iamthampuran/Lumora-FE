@@ -6,10 +6,11 @@ import { finalize } from 'rxjs';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { CommonModule } from '@angular/common';
 import { EventStatus } from '../../enums/event.status.enum';
+import { PaymentModal } from '../payment-modal/payment-modal';
 
 @Component({
   selector: 'app-event-details',
-  imports: [LoaderComponent, CommonModule, RouterModule],
+  imports: [LoaderComponent, CommonModule, RouterModule, PaymentModal],
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })
@@ -26,6 +27,9 @@ export class EventDetails implements OnInit {
   readonly inquiryDetails = computed(() => this.eventData()?.inquiryDetails ?? []);
   readonly activeInquiriesCount = computed(() => this.inquiryDetails().length);
 
+  isPaymentModalOpen = signal<boolean>(false);
+  selectedInquiryId = signal<string>('');
+
   ngOnInit(): void {
     const eventId = this.route.snapshot.paramMap.get('id');
     if (eventId) {
@@ -40,20 +44,21 @@ export class EventDetails implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.consumerService.getEventDetails(eventId)
-    .pipe(finalize(() => this.isLoading.set(false)))
-    .subscribe({
-      next: (data) => {
-        this.eventData.set(data);
-        if (!data?.eventInformationDetails) {
-          this.errorMessage.set('Event details are unavailable for this event.');
-        }
-      },
-      error: (error) => {
-        this.errorMessage.set('Unable to load event details right now. Please try again.');
-        console.error('Error fetching event details:', error);
-      },
-    });
+    this.consumerService
+      .getEventDetails(eventId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (data) => {
+          this.eventData.set(data);
+          if (!data?.eventInformationDetails) {
+            this.errorMessage.set('Event details are unavailable for this event.');
+          }
+        },
+        error: (error) => {
+          this.errorMessage.set('Unable to load event details right now. Please try again.');
+          console.error('Error fetching event details:', error);
+        },
+      });
   }
 
   // --- Helpers for Formatting ---
@@ -96,22 +101,72 @@ export class EventDetails implements OnInit {
   // --- Inquiry Formatting (Matches Canva Exactly) ---
 
   getEventStatusLabel(): string {
-    const hasAccepted = this.inquiryDetails().some((item) => item.inquiryStatus === 'accepted');
-    if (hasAccepted) return 'Accepted';
+    const statuses = this.inquiryDetails()
+      .map((item) => item.inquiryStatus?.toLowerCase())
+      .filter(Boolean);
+
+    if (statuses.includes('confirmed')) {
+      return 'Confirmed';
+    }
+
+    if (statuses.includes('accepted')) {
+      return 'Accepted';
+    }
+
+    if (statuses.includes('submitted')) {
+      return 'Searching';
+    }
+
+    if (statuses.length > 0 && statuses.every((status) => status === 'rejected')) {
+      return 'No Studio Accepted';
+    }
+
+    if (statuses.length > 0 && statuses.every((status) => status === 'cancelled')) {
+      return 'Cancelled';
+    }
+
+    if (
+      statuses.length > 0 &&
+      statuses.every((status) => status === 'rejected' || status === 'cancelled')
+    ) {
+      return 'No Active Inquiries';
+    }
+
     return 'Searching';
   }
 
   getInquiryAgeLabel(date: Date | string, status: string): string {
     const parsed = new Date(date);
-    if (isNaN(parsed.getTime())) return 'Updated recently';
-
+    if (isNaN(parsed.getTime())) {
+      return 'Updated recently';
+    }
     const diffMs = Math.max(0, Date.now() - parsed.getTime());
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    const action = status.toLowerCase() === 'accepted' ? 'Responded' : 'Sent';
-
-    if (days === 0) return `${action} today`;
-    if (days === 1) return `${action} 1 day ago`;
+    const lowerStatus = status?.toLowerCase();
+    let action = 'Sent';
+    switch (lowerStatus) {
+      case 'submitted':
+        action = 'Sent';
+        break;
+      case 'accepted':
+        action = 'Responded';
+        break;
+      case 'confirmed':
+        action = 'Confirmed';
+        break;
+      case 'rejected':
+        action = 'Declined';
+        break;
+      case 'cancelled':
+        action = 'Cancelled';
+        break;
+    }
+    if (days === 0) {
+      return `${action} today`;
+    }
+    if (days === 1) {
+      return `${action} 1 day ago`;
+    }
     return `${action} ${days} days ago`;
   }
 
@@ -128,6 +183,24 @@ export class EventDetails implements OnInit {
     const eventId = this.route.snapshot.paramMap.get('id');
     if (eventId) {
       this.router.navigate(['/consumer/events', eventId, 'studios']);
+    }
+  }
+
+  openPaymentModal(inquiryId: string): void {
+    this.selectedInquiryId.set(inquiryId);
+    this.isPaymentModalOpen.set(true);
+  }
+
+  closePaymentModal(): void {
+    this.isPaymentModalOpen.set(false);
+  }
+
+  onPaymentSuccess(): void {
+    // Refresh the event details to reflect the new "Paid" status
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      // NOTE: Calling the existing getEventDetails function
+      this.getEventDetails(id);
     }
   }
 }
