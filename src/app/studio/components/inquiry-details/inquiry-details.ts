@@ -7,7 +7,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LoaderComponent } from '../../../shared/components/loader/loader';
 import { StudioService } from '../../services/studio.service';
-import { TeamMember } from '../../models/inquiry-details';
+import { MemberDetails } from '../../models/member-details';
+import { EventStatus } from '../../../consumer/enums/event.status.enum';
 
 @Component({
   selector: 'app-inquiry-details',
@@ -33,24 +34,33 @@ export class InquiryDetails implements OnInit {
   teamSearchQuery = signal<string>('');
   assignmentNotes = signal<string>('');
   selectedTeamMemberIds = signal<string[]>([]);
+  
   isAcceptModalOpen = signal<boolean>(false);
   isDeclineModalOpen = signal<boolean>(false);
   declineReason = signal<string>('');
 
-  // Available professionals list mock for assignment modal
-  availableProfessionals = signal<TeamMember[]>([
-    { id: 'prof-1', name: 'Julian Vane', role: 'Lead Photographer', location: 'London', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150' },
-    { id: 'prof-2', name: 'Sarah Chen', role: 'Retoucher', location: 'NYC', avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150' },
-    { id: 'prof-3', name: 'Rohan Kapoor', role: 'Videographer', location: 'Mumbai', avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150' },
-    { id: 'prof-4', name: 'Meera Nair', role: 'Coordinator', location: 'Kochi', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150' }
-  ]);
+  availableMembers = signal<MemberDetails[]>([]);
+
+  eventStatus = EventStatus;
+
+  private colorProfiles = [
+    { avatar: 'bg-orange-50 text-orange-600', badge: 'bg-orange-50 text-orange-600 border-orange-100' },
+    { avatar: 'bg-blue-50 text-blue-600', badge: 'bg-blue-50 text-blue-600 border-blue-100' },
+    { avatar: 'bg-green-50 text-green-600', badge: 'bg-green-50 text-green-600 border-green-100' },
+    { avatar: 'bg-purple-50 text-purple-600', badge: 'bg-purple-50 text-purple-600 border-purple-100' },
+  ];
 
   // Computed Helpers
-  filteredProfessionals = computed(() => {
+  filteredMembers = computed(() => {
     const q = this.teamSearchQuery().toLowerCase().trim();
-    if (!q) return this.availableProfessionals();
-    return this.availableProfessionals().filter(
-      p => p.name.toLowerCase().includes(q) || p.role.toLowerCase().includes(q)
+    if (!q) return this.availableMembers();
+    
+    return this.availableMembers().filter(
+      (m) =>
+        m.fullName.toLowerCase().includes(q) ||
+        m.email.toLowerCase().includes(q) ||
+        m.phone.toLowerCase().includes(q) ||
+        m.employeeRole.toLowerCase().includes(q)
     );
   });
 
@@ -105,15 +115,38 @@ export class InquiryDetails implements OnInit {
     this.processInquiryResponse(false);
   }
 
-  // // --- Team Member Assignment Modal ---
+  // --- Team Member UI Helpers ---
+  getInitials(name: string): string {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  getColorProfile(name: string) {
+    if (!name) return this.colorProfiles[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % this.colorProfiles.length;
+    return this.colorProfiles[index];
+  }
+
+  // --- Team Member Assignment Modal ---
   openAssignModal(): void {
     this.isAssignModalOpen.set(true);
+    this.fetchMembers();
   }
 
   closeAssignModal(): void {
     this.isAssignModalOpen.set(false);
     this.teamSearchQuery.set('');
     this.assignmentNotes.set('');
+    if (this.inquiryId() != null)
+      this.fetchInquiryDetails(this.inquiryId() as string);
   }
 
   toggleTeamMember(memberId: string): void {
@@ -130,53 +163,52 @@ export class InquiryDetails implements OnInit {
   }
 
   confirmTeamAssignments(): void {
-  //   const id = this.inquiryId();
-  //   if (!id || this.selectedTeamMemberIds().length === 0) return;
+    // This is currently a placeholder logic as in the provided code
+    // It can be adapted to hit the real endpoint using selectedTeamMemberIds() and assignmentNotes()
+    
+    const id = this.inquiryId();
+    if (!id || this.selectedTeamMemberIds().length === 0) return;
+    this.isActionLoading.set(true);
+    this.studioService.assignTeamMembers(id, this.selectedTeamMemberIds())
+      .pipe(finalize(() => {
+        this.isActionLoading.set(false);
+        this.closeAssignModal();
+      }))
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Team members assigned successfully!', 'Close', { duration: 3000 });
+        },
+        error: (err) => {
+          this.snackBar.open(err.error?.message || 'Failed to assign team members.', 'Close', { duration: 3000 });
+        }
+      });
 
-  //   this.isActionLoading.set(true);
-  //   const assignedMembers = this.availableProfessionals().filter(p => this.selectedTeamMemberIds().includes(p.id));
-
-  //   this.studioService.assignTeamMembers(id, this.selectedTeamMemberIds(), this.assignmentNotes())
-  //     .pipe(finalize(() => {
-  //       this.isActionLoading.set(false);
-  //       this.closeAssignModal();
-  //     }))
-  //     .subscribe({
-  //       next: () => {
-  //         this.snackBar.open('Team members assigned successfully!', 'Close', { duration: 3000 });
-  //         // Optimistically update local view
-  //         this.inquiry.update(data => data ? { ...data, teamAssignments: assignedMembers } : null);
-  //       },
-  //       error: () => {
-  //         this.snackBar.open('Team members assigned locally.', 'Close', { duration: 3000 });
-  //         this.inquiry.update(data => data ? { ...data, teamAssignments: assignedMembers } : null);
-  //       }
-  //     });
+    this.snackBar.open('Assignments confirmed (placeholder)', 'Close', { duration: 3000 });
+    this.closeAssignModal();
   }
 
   private processInquiryResponse(isAccepted: boolean, rejectedMessage?: string | null): void {
-  const id = this.inquiryId();
-  if (!id) return;
+    const id = this.inquiryId();
+    if (!id) return;
+    
+    this.isActionLoading.set(true);
 
-  this.isActionLoading.set(true);
-  
-  // Make sure your StudioService has the respondToInquiry method implemented
-  this.studioService.respondToInquiry(id, isAccepted, rejectedMessage)
-    .pipe(finalize(() => {
-      this.isActionLoading.set(false);
-      if (isAccepted) this.closeAcceptModal();
-      else this.closeDeclineModal();
-    }))
-    .subscribe({
-      next: () => {
-        this.snackBar.open(isAccepted ? 'Inquiry accepted!' : 'Inquiry declined.', 'Close', { duration: 3000 });
-        this.fetchInquiryDetails(id);
-      },
-      error: (err) => {
-        this.snackBar.open(err.error?.message || 'Failed to update inquiry.', 'Close', { duration: 3000 });
-      }
-    });
-}
+    this.studioService.respondToInquiry(id, isAccepted, rejectedMessage)
+      .pipe(finalize(() => {
+        this.isActionLoading.set(false);
+        if (isAccepted) this.closeAcceptModal();
+        else this.closeDeclineModal();
+      }))
+      .subscribe({
+        next: () => {
+          this.snackBar.open(isAccepted ? 'Inquiry accepted!' : 'Inquiry declined.', 'Close', { duration: 3000 });
+          this.fetchInquiryDetails(id);
+        },
+        error: (err) => {
+          this.snackBar.open(err.error?.message || 'Failed to update inquiry.', 'Close', { duration: 3000 });
+        }
+      });
+  }
 
   downloadReceipt(): void {
     this.snackBar.open('Downloading payment receipt...', 'Close', { duration: 2500 });
@@ -192,29 +224,42 @@ export class InquiryDetails implements OnInit {
   }
 
   openAcceptModal(): void {
-  this.isAcceptModalOpen.set(true);
-}
+    this.isAcceptModalOpen.set(true);
+  }
+  
+  closeAcceptModal(): void {
+    this.isAcceptModalOpen.set(false);
+  }
 
-closeAcceptModal(): void {
-  this.isAcceptModalOpen.set(false);
-}
+  openDeclineModal(): void {
+    this.declineReason.set(''); // Reset reason
+    this.isDeclineModalOpen.set(true);
+  }
+  
+  closeDeclineModal(): void {
+    this.isDeclineModalOpen.set(false);
+  }
 
-openDeclineModal(): void {
-  this.declineReason.set(''); // Reset reason
-  this.isDeclineModalOpen.set(true);
-}
+  // --- Action Executions ---
+  confirmAccept(): void {
+    this.processInquiryResponse(true);
+  }
 
-closeDeclineModal(): void {
-  this.isDeclineModalOpen.set(false);
-}
+  confirmDecline(): void {
+    const reason = this.declineReason().trim();
+    this.processInquiryResponse(false, reason.length > 0 ? reason : null);
+  }
 
-// --- Action Executions ---
-confirmAccept(): void {
-  this.processInquiryResponse(true);
-}
+  fetchMembers(){
+    this.studioService.getTeamMembers().subscribe({
+      next: (members) => {
+        this.availableMembers.set(members);
+      },
+      error: (err) => {
+        this.snackBar.open(err.error?.message || 'Failed to fetch team members.', 'Close', { duration: 3000 });
+      }
+    });
+  }
 
-confirmDecline(): void {
-  const reason = this.declineReason().trim();
-  this.processInquiryResponse(false, reason.length > 0 ? reason : null);
-}
+
 }
