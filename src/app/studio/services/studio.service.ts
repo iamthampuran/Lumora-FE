@@ -1,11 +1,7 @@
 import { inject, Service } from '@angular/core';
 import { BaseService } from '../../shared/services/base.service';
 import { Observable } from 'rxjs';
-import {
-  PortfolioDetails,
-  StudioProfileModel,
-  UpdateStudioTagsPayload,
-} from '../models/studio-profile-model';
+import { PortfolioDetails, StudioProfileModel, UpdateStudioTagsPayload } from '../models/studio-profile-model';
 import { environment } from '../../../environments/environment';
 import { ProfileCompletionResult } from '../models/profile-completion';
 import { StudioDashboardSummary } from '../models/studio-dashboard';
@@ -13,7 +9,6 @@ import { HttpParams } from '@angular/common/http';
 import { GetStudioInquiriesResponse, InquiryFilter } from '../models/studio-inquiry';
 import { InquiryDetail } from '../../consumer/models/event-data';
 import { InquiryData } from '../models/inquiry-details';
-import { MemberDetails } from '../models/member-details';
 
 @Service()
 export class StudioService {
@@ -60,7 +55,7 @@ export class StudioService {
     title: string | null,
     order: number,
     file?: File,
-    isDeleted: boolean = false,
+    isDeleted: boolean = false
   ): Observable<any> {
     const url = `${this.baseUrl}/update-portfolio-image/${imageId}`;
     const formData = new FormData();
@@ -72,14 +67,14 @@ export class StudioService {
     return this.baseService.put(url, formData);
   }
 
-  addStudioTags(studioId: string, payload: UpdateStudioTagsPayload): Observable<any> {
+  addStudioTags(studioId : string, payload: UpdateStudioTagsPayload): Observable<any> {
     const url = `${this.baseUrl}/${studioId}/add-studio-tags`;
     return this.baseService.post(url, payload);
   }
 
   addTeamMembers(studioId: string, payload: any): Observable<any> {
     // Adjust the endpoint URL to match your backend route perfectly
-    const url = `${this.baseUrl}/${studioId}/add-employee-details`;
+    const url = `${this.baseUrl}/${studioId}/add-employee-details`; 
     return this.baseService.post(url, payload);
   }
 
@@ -89,81 +84,57 @@ export class StudioService {
   }
 
   getStudioInquiries(
-    status: number,
-    pageCount: number,
-    pageSize: number,
-    filters?: InquiryFilter | null,
-  ): Observable<GetStudioInquiriesResponse> {
-    const url = `${this.baseUrl}/inquiry-list/${status}`;
-    let params = new HttpParams()
-      .set('pageCount', pageCount.toString())
-      .set('pageSize', pageSize.toString());
+  status: number, 
+  pageCount: number, 
+  pageSize: number, 
+  filters?: InquiryFilter | null
+): Observable<GetStudioInquiriesResponse> {
+  const url = `${this.baseUrl}/inquiry-list/${status}`;
+  let params = new HttpParams()
+    .set('pageCount', pageCount.toString())
+    .set('pageSize', pageSize.toString());
 
-    if (filters) {
-      if (filters.eventTypes && filters.eventTypes.length > 0) {
-        filters.eventTypes.forEach((id) => {
-          params = params.append('EventTypeIds', id);
-        });
-      }
-      if (filters.fromDate) params = params.set('StartDate', filters.fromDate.toDateString());
-      if (filters.toDate) params = params.set('EndDate', filters.toDate.toDateString());
-      if (filters.location) params = params.set('Location', filters.location);
-      if (filters.minAmount !== undefined && filters.minAmount !== null)
-        params = params.set('MinAmount', filters.minAmount.toString());
-      if (filters.maxAmount !== undefined && filters.maxAmount !== null)
-        params = params.set('MaxAmount', filters.maxAmount.toString());
+  if (filters) {
+    if (filters.eventTypes && filters.eventTypes.length > 0) {
+      filters.eventTypes.forEach(id => { params = params.append('EventTypeIds', id); });
     }
-
-    return this.baseService.get(url, params);
+    if (filters.fromDate) params = params.set('StartDate', filters.fromDate.toDateString());
+    if (filters.toDate) params = params.set('EndDate', filters.toDate.toDateString());
+    if (filters.location) params = params.set('Location', filters.location);
+    if (filters.minAmount !== undefined && filters.minAmount !== null) params = params.set('MinAmount', filters.minAmount.toString());
+    if (filters.maxAmount !== undefined && filters.maxAmount !== null) params = params.set('MaxAmount', filters.maxAmount.toString());
   }
 
-  getInquiryDetails(inquiryId: string): Observable<InquiryData> {
-    const url = `${this.baseUrl}/inquiries/${inquiryId}`;
-    return this.baseService.get(url);
+  return this.baseService.get(url, params);
+}
+
+getInquiryDetails(inquiryId: string): Observable<InquiryData> {
+  const url = `${this.baseUrl}/inquiries/${inquiryId}`;
+  return this.baseService.get(url);
+}
+
+respondToInquiry(inquiryId: string, isAccepted: boolean, rejectedMessage?: string | null): Observable<any> {
+  const url = `${this.baseUrl}/inquiries/${inquiryId}/respond`;
+  return this.baseService.patch(url, { isAccepted: isAccepted, inquiryId: inquiryId, rejectedMessage: rejectedMessage });
+}
+
+updatePaymentInformation(upiId: string | null, qrCodeFile: File | null): Observable<any> {
+  const formData = new FormData();
+  
+  // Append values if they exist based on the Swagger spec
+  if (upiId) {
+    formData.append('upiId', upiId);
+  }
+  if (qrCodeFile) {
+    formData.append('file', qrCodeFile);
   }
 
-  respondToInquiry(
-    inquiryId: string,
-    isAccepted: boolean,
-    rejectedMessage?: string | null,
-  ): Observable<any> {
-    const url = `${this.baseUrl}/inquiries/${inquiryId}/respond`;
-    return this.baseService.patch(url, {
-      isAccepted: isAccepted,
-      inquiryId: inquiryId,
-      rejectedMessage: rejectedMessage,
-    });
-  }
+  return this.baseService.patch(`${this.baseUrl}/payment-information`, formData);
+}
 
-  updatePaymentInformation(upiId: string | null, qrCodeFile: File | null): Observable<any> {
-    const formData = new FormData();
+getProfileImages(): Observable<PortfolioDetails[]> {
+  const url = `${this.baseUrl}/profile-images`;
+  return this.baseService.get(url);
+}
 
-    // Append values if they exist based on the Swagger spec
-    if (upiId) {
-      formData.append('upiId', upiId);
-    }
-    if (qrCodeFile) {
-      formData.append('file', qrCodeFile);
-    }
-
-    return this.baseService.patch(`${this.baseUrl}/payment-information`, formData);
-  }
-
-  getProfileImages(): Observable<PortfolioDetails[]> {
-    const url = `${this.baseUrl}/profile-images`;
-    return this.baseService.get(url);
-  }
-
-  getTeamMembers(): Observable<MemberDetails[]> {
-    const url = `${this.baseUrl}/members`;
-    return this.baseService.get(url);
-  }
-
-  assignTeamMembers(inquiryId: string, memberIds: string[]): Observable<any> {
-    const url = `${this.baseUrl}/inquiries/${inquiryId}/assign-members`;
-    return this.baseService.patch(url, {
-      employeeIds: memberIds,
-      inquiryId: inquiryId
-    });
-  }
 }

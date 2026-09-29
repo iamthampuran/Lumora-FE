@@ -1,6 +1,3 @@
-import { EventStatus } from "../../consumer/enums/event.status.enum";
-import { MemberDetails } from "./member-details";
-
 export interface EventDetails {
   title: string;
   category: string;
@@ -10,7 +7,6 @@ export interface EventDetails {
   budget: number;
   specialRequirements?: string | null;
   tags: string[];
-  status: EventStatus;
 }
 
 export interface ConsumerDetails {
@@ -32,7 +28,13 @@ export interface PaymentSummary {
   paidAt?: string | null;
 }
 
-
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  avatarUrl?: string | null;
+  location?: string | null;
+}
 
 export interface InquiryData {
   inquiryId: string;
@@ -43,5 +45,5 @@ export interface InquiryData {
   event: EventDetails;
   consumer: ConsumerDetails;
   payment?: PaymentSummary | null;
-  assignedEmployees?: MemberDetails[];
+  teamAssignments?: TeamMember[];
 }
