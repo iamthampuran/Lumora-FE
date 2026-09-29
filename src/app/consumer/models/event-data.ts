@@ -1,33 +1,34 @@
-import { EventStatus } from "../enums/event.status.enum";
+import { EventStatus } from '../enums/event.status.enum';
 
-export interface EventData{
-    inquiryDetails: InquiryDetail[];
-    eventInformationDetails: EventInformationDetails;
+export interface EventData {
+  inquiryDetails: InquiryDetail[];
+  eventInformationDetails: EventInformationDetails;
 }
 
-export interface InquiryDetail{
-    id: string;
-    studioName: string;
-    profileUrl: string | null;
-    inquiryStatus: string;
-    amount: number;
-    lastUpdated: Date;
+export interface InquiryDetail {
+  id: string;
+  studioName: string;
+  profileUrl: string | null;
+  inquiryStatus: string;
+  amount: number;
+  lastUpdated: Date;
+  assignedEmployees?: { employeeId: string; fullName: string; employeeRole: string; phone: string }[];
 }
 
-export interface EventInformationDetails{
-    category: string;
-    duration: number;
-    budget: number;
-    tags: string[];
-    additionalInformation: string | null;
-    title: string;
-    eventDate: Date;
-    location: {
-        latitude: number;
-        longitude: number;
-        locationName: string
-    },
-    status: EventStatus
+export interface EventInformationDetails {
+  category: string;
+  duration: number;
+  budget: number;
+  tags: string[];
+  additionalInformation: string | null;
+  title: string;
+  eventDate: Date;
+  location: {
+    latitude: number;
+    longitude: number;
+    locationName: string;
+  };
+  status: EventStatus;
 }
 
 export interface EventEditDetails {
@@ -44,5 +45,5 @@ export interface EventEditDetails {
   budget: number;
   duration: number;
   specialRequirements: string | null;
-  tags: Record<string, string>; 
+  tags: Record<string, string>;
 }

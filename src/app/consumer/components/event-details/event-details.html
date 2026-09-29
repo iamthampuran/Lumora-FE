@@ -136,6 +136,62 @@
           </p>
         </div>
 
+        <!-- Assigned Team Section (Now reads from the confirmed/paid inquiry) -->
+        @for (inquiry of inquiryDetails(); track inquiry.id) {
+          @if (inquiry.inquiryStatus.toLowerCase() === 'confirmed' || inquiry.inquiryStatus.toLowerCase() === 'paid') {
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sm:p-8 mt-8">
+              <h3 class="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-[#CF6B4E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                </svg>
+                Assigned Team ({{ inquiry.studioName }})
+              </h3>
+
+              @if (!inquiry.assignedEmployees?.length) {
+              <div class="border border-dashed border-gray-200 rounded-xl p-8 text-center bg-[#FAF8F5]">
+                <div class="w-10 h-10 mx-auto rounded-full bg-orange-50 text-[#CF6B4E] flex items-center justify-center mb-3">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197M6 18.719A5.971 5.971 0 016.941 15.52m0 0A5.998 5.971 0 0012 12.75a5.998 5.998 0 005.059 2.77" />
+                  </svg>
+                </div>
+                <p class="text-xs font-bold text-gray-900 mb-1">No team assigned yet.</p>
+                <p class="text-[11px] text-gray-500">The studio will assign professionals once the booking is confirmed.</p>
+              </div>
+              } @else {
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @for (member of inquiry.assignedEmployees; track member.employeeId) {
+                <div class="flex items-center gap-3 p-3 border border-gray-100 rounded-xl bg-white shadow-2xs">
+                  <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-[#FFF5F0] text-[#CF6B4E]">
+                    {{ member.fullName.charAt(0) }}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold text-gray-900 truncate">
+                      {{ member.fullName }}
+                    </p>
+                    <p class="text-[11px] text-[#CF6B4E] font-medium">
+                      {{ member.employeeRole }}
+                    </p>
+                  </div>
+                  
+                  <!-- Phone Number Action -->
+                  @if (member.phone) {
+                  <a [href]="'tel:' + member.phone" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors shrink-0" title="Call">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.48-4.18-7.076-7.076l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                    </svg>
+                  </a>
+                  }
+                </div>
+                }
+              </div>
+              }
+            </div>
+          }
+        }
+
         <!-- Action Button -->
         @if(eventInfo()?.status === eventStatusEnum.Created || eventInfo()?.status ===
         eventStatusEnum.InquiryInProgress){
